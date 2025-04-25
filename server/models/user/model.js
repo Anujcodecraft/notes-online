@@ -11,13 +11,15 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  notes: {
+  notes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "notes",
-  },
-  pyq: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "pyq",
+  }],
+  
+  upvotes: { 
+    type: [mongoose.Schema.Types.ObjectId], 
+    ref: 'User',
+    default: []  // Initialize as empty array
   },
   solution: {
     type: mongoose.Schema.Types.ObjectId,

@@ -33,14 +33,19 @@ const PyqsPage = () => {
       if (filters.subject) queryParams.append('subject', filters.subject);
       if (filters.title) queryParams.append('title', filters.title);
       
-      const response = await fetch(`/pyqs?${queryParams.toString()}`);
+      const response = await fetch(`http://localhost:3000/pyqs?${queryParams.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch PYQs');
       }
       
       const data = await response.json();
-      setPyqs(data);
+      // Ensure uploadedBy exists with at least a name property
+      const processedData = data.map(pyq => ({
+        ...pyq,
+        uploadedBy: pyq.uploader || { name: 'Unknown' } // Changed from uploadedBy to uploader
+      }));
+      setPyqs(processedData);
     } catch (err) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -61,7 +66,7 @@ const PyqsPage = () => {
     }
     
     try {
-      const response = await fetch(`/notes/${id}/upvote`, {
+      const response = await fetch(`http://localhost:3000/notes/${id}/upvote`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

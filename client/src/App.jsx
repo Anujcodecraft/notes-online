@@ -32,6 +32,8 @@ function App() {
             <Route path="/Profile" element={<Profile />} />
             <Route path="/my-notes" element={<MyNotes />} />
             
+            
+            
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

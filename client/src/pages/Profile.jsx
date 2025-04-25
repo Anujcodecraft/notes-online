@@ -1,141 +1,180 @@
-import { User, Mail, Calendar, Book, FileText, CheckSquare } from 'lucide-react';
-import React from 'react';
+import { User, Mail, Calendar, Book, FileText, CheckSquare, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
+import axios from 'axios';
 
 export default function UserPagePreview() {
-  // Mock user data for preview
+  const { currentUser } = useAuth();
+  const [stats, setStats] = useState({
+    notesUploaded: 0,
+    pyqsUploaded: 0,
+    solutionsUploaded: 0,
+    dateJoined: currentUser?.date || "Loading..."
+  });
+  const [loading, setLoading] = useState(true);
 
-  
-  // Stats for demonstration
-  const userStats = {
-    dateJoined: "April 12, 2025",
-    notesUploaded: 8,
-    pyqsUploaded: 12,
-    solutionsUploaded: 5
-  };
-  const {currentUser} = useAuth()
-  console.log(currentUser)
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      try {
+        // Fetch notes count
+        const notesRes = await axios.get(`http://localhost:3000/my-notes?email=${currentUser.emailtoSend}`);
+        // Fetch PYQs count (you'll need to implement this endpoint)
+        // const pyqsRes = await axios.get(`http://localhost:3000/my-pyqs?email=${currentUser.emailtoSend}`);
+        // Fetch solutions count (you'll need to implement this endpoint)
+        // const solutionsRes = await axios.get(`http://localhost:3000/my-solutions?email=${currentUser.emailtoSend}`);
+        
+        setStats({
+          ...stats,
+          notesUploaded: notesRes.data.length,
+          // pyqsUploaded: pyqsRes.data.length,
+          // solutionsUploaded: solutionsRes.data.length
+        });
+      } catch (err) {
+        console.error('Error fetching user stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (currentUser?.emailtoSend) {
+      fetchUserStats();
+    }
+  }, [currentUser]);
+
+  const statCards = [
+    { icon: Book, value: stats.notesUploaded, label: "Notes", color: "blue" },
+    { icon: FileText, value: stats.pyqsUploaded, label: "PYQs", color: "green" },
+    { icon: CheckSquare, value: stats.solutionsUploaded, label: "Solutions", color: "purple" },
+    { icon: Clock, value: new Date(stats.dateJoined).toLocaleDateString(), label: "Member Since", color: "indigo" }
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 min-h-screen pt-8 pb-12 mt-11">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">User Profile</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            View and manage your account information
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen pt-6 pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header with animation */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-10 text-center"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+            User Profile
+          </h1>
+          <p className="mt-3 text-lg text-gray-600 dark:text-gray-300">
+            Manage your account and view contributions
           </p>
-        </div>
+        </motion.div>
 
-        {/* Profile Card */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          {/* Profile Header with Avatar */}
-          <div className="bg-blue-600 px-6 py-8">
+        {/* Profile Card with animation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden"
+        >
+          {/* Profile Header with gradient background */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-12 relative">
             <div className="flex flex-col items-center">
-              <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mb-4">
-                <User className="h-14 w-14 text-blue-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-white">{currentUser.nametoSend}</h2>
-              <p className="text-blue-100">{currentUser.emailtoSend}</p>
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="h-32 w-32 bg-white dark:bg-gray-100 rounded-full flex items-center justify-center mb-6 border-4 border-white/20 shadow-lg"
+              >
+                <User className="h-16 w-16 text-blue-600 dark:text-blue-700" />
+              </motion.div>
+              <h2 className="text-3xl font-bold text-white">
+                {currentUser.nametoSend}
+              </h2>
+              <p className="text-blue-100 mt-2">
+                {currentUser.emailtoSend}
+              </p>
             </div>
           </div>
 
           {/* User Information */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* User Details */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
+          <div className="p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* User Details Card */}
+              <motion.div
+                whileHover={{ y: -5 }}
+                className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600"
+              >
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 pb-2 border-b border-gray-200 dark:border-gray-600 flex items-center">
+                  <User className="h-5 w-5 text-blue-500 mr-2" />
+                  Account Information
+                </h3>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center">
-                    <User className="h-5 w-5 text-blue-500 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Full Name</p>
-                      <p className="text-gray-900">{currentUser.nametoSend}</p>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg">
+                      <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</p>
+                      <p className="text-gray-900 dark:text-white font-medium">{currentUser.nametoSend}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center">
-                    <Mail className="h-5 w-5 text-blue-500 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Email Address</p>
-                      <p className="text-gray-900">{currentUser.emailtoSend}</p>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg">
+                      <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</p>
+                      <p className="text-gray-900 dark:text-white font-medium">{currentUser.emailtoSend}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-blue-500 mr-3" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-500">Member Since</p>
-                      <p className="text-gray-900">{currentUser.date}</p>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 p-2 rounded-lg">
+                      <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</p>
+                      <p className="text-gray-900 dark:text-white font-medium">{stats.dateJoined}</p>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* User Stats */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Contribution Stats</h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Book className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-lg font-semibold">{userStats.notesUploaded}</p>
-                        <p className="text-sm text-gray-500">Notes</p>
-                      </div>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                {statCards.map((stat, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                    className={`bg-white dark:bg-gray-700 p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 flex flex-col items-center text-center`}
+                  >
+                    <div className={`p-3 rounded-full bg-${stat.color}-100 dark:bg-${stat.color}-900/50 mb-3`}>
+                      <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
                     </div>
-                  </div>
-                  
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <FileText className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-lg font-semibold">{userStats.pyqsUploaded}</p>
-                        <p className="text-sm text-gray-500">PYQs</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <CheckSquare className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-lg font-semibold">{userStats.solutionsUploaded}</p>
-                        <p className="text-sm text-gray-500">Solutions</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-yellow-100 rounded-lg">
-                        <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-lg font-semibold">{userStats.notesUploaded + userStats.pyqsUploaded + userStats.solutionsUploaded}</p>
-                        <p className="text-sm text-gray-500">Total</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {stat.value}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {stat.label}
+                    </p>
+                  </motion.div>
+                ))}
               </div>
             </div>
-            
-            {/* Actions */}
+
+            {/* Recent Activity Section */}
 
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
