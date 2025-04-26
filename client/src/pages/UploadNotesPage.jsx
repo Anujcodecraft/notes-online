@@ -10,6 +10,7 @@ const UploadNotesPage = () => {
     subject: '',
     file: null
   });
+  const {currentUser} = useAuth()
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ const UploadNotesPage = () => {
     data.append('branch', formData.branch);
     data.append('subject', formData.subject);
     data.append('file', formData.file);
+    data.append('email',currentUser.emailtoSend)
     console.log(localStorage.getItem('token'))
 
     try {

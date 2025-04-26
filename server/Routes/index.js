@@ -72,32 +72,38 @@ Router.post('/login', async (req, res) => {
 
   Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, res) => {
     try {
-      console.log("hello anuj");
+      console.log("Received upload request");
+      const { year, branch, subject, email } = req.body;
   
-      const { year, branch, subject } = req.body;
+      // Find the user by email
+      const UUser = await userModel.findOne({ email });
   
+      if (!UUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      // Create note
       const note = await notesModel.create({
         year,
         branch,
         subject,
-        uploader: req.user.id,
-        fileurl: req.file.path
+        user: UUser._id,
+        fileurl: req.file.path,
       });
+      console.log("the uploader id is as follows",note.user)
   
-      console.log(req.file.mimetype);
-  
-      // Update the user's uploadedNotes array
-      await userModel.findByIdAndUpdate(req.user.id, {
-        $push: { uploadedNotes: note._id }
+      // Add note ID to user's notes array
+      await userModel.findByIdAndUpdate(UUser._id, {
+        $push: { notes: note._id },
       });
   
       res.status(201).json(note);
     } catch (err) {
-      console.log(err);
-      console.log("ghii");
+      console.error(err);
       res.status(400).json({ error: 'Note upload failed', details: err.message });
     }
   });
+  
   Router.get('/notes', async (req, res) => {
     try {
       const { subject, branch, year } = req.query;
@@ -119,56 +125,134 @@ Router.post('/login', async (req, res) => {
     }
   });
 
+  const allowedTitles = ['Mini', 'Mid', 'End'];
+  const allowedBranches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
+  // Add more allowed values for year and subject as needed
+  
   Router.post('/upload-pyqs', mainmiddleware, upload.single('file'), async (req, res) => {
     try {
-      const { title, year, branch, subject } = req.body;
-  
-      // Validate title enum
-      const allowedTitles = ['Mini', 'Mid', 'End'];
-      if (!allowedTitles.includes(title)) {
-        return res.status(400).json({ error: 'Invalid title. Must be one of mini, mid, end.' });
-      }
-  
-      // Create PYQ entry
-      const pyq = await pyqModel.create({
-        title,
-        year,
-        branch,
-        subject,
-        uploader: req.user.id,
-        fileurl: req.file.path,
-      });
-  
-      // Update User Model
-      await userModel.findByIdAndUpdate(req.user.id, {
-        $push: { uploadedPYQs: pyq._id },
-      });
-  
-      res.status(201).json(pyq);
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ error: 'PYQ upload failed', details: err.message });
-    }
-  });
+        const { title, year, branch, subject,email } = req.body;
+        // const { email } = req.user; // Get email from authenticated user
 
-  Router.get('/pyqs', async (req, res) => {
-    try {
-      const { title, year, branch, subject } = req.query;
-  
-      const filter = {};
-      if (title) filter.title = title;
-      if (year) filter.year = year;
-      if (branch) filter.branch = branch;
-      if (subject) filter.subject = subject;
-  
-      const pyqs = await pyqModel.find(filter);
-  
-      res.status(200).json(pyqs);
+        console.log("Received data:", { title, year, branch, subject, email });
+
+        // Validate required fields
+        if (!title || !year || !branch || !subject || !req.file) {
+            return res.status(400).json({ 
+                error: 'Missing required fields',
+                required: ['title', 'year', 'branch', 'subject', 'file']
+            });
+        }
+
+        // Validate title enum
+        if (!allowedTitles.includes(title)) {
+            return res.status(400).json({ 
+                error: 'Invalid title',
+                allowedTitles: allowedTitles
+            });
+        }
+
+        // Validate branch
+        if (!allowedBranches.includes(branch)) {
+            return res.status(400).json({ 
+                error: 'Invalid branch',
+                allowedBranches: allowedBranches
+            });
+        }
+
+        // Sanitize inputs
+        const sanitizedYear = year.trim();
+        const sanitizedSubject = subject.trim();
+
+        // Find user by email from authenticated request
+        const UUser = await userModel.findOne({ email });
+        if (!UUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Create PYQ entry
+        const pyq = await pyqModel.create({
+          title,
+          year: sanitizedYear,
+          branch,
+          subject: sanitizedSubject,
+          user: UUser._id,
+          fileurl: req.file.path,
+          // Remove this line: upvotes: 0,
+          createdAt: new Date()
+        });
+        console.log("the user uploader is",pyq.uploader);
+        
+        // Update User Model
+        await userModel.findByIdAndUpdate(
+            UUser._id, 
+            { $push: { uploadedPYQs: pyq._id } },
+            { new: true, runValidators: true }
+        ).catch(err => {
+            console.error('Failed to update user:', err);
+        });
+
+        // Return success response
+        res.status(201).json({
+            message: 'PYQ uploaded successfully',
+            pyq: {
+                id: pyq._id,
+                title: pyq.title,
+                year: pyq.year,
+                branch: pyq.branch,
+                subject: pyq.subject,
+                fileurl: pyq.fileurl,
+                uploader: {
+                    id: UUser._id,
+                    name: UUser.name,
+                    email: UUser.email
+                }
+            }
+        });
+
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to fetch PYQs', details: err.message });
+        console.error('PYQ upload error:', err);
+        
+        // Handle specific errors
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({ 
+                error: 'Validation failed',
+                details: err.errors 
+            });
+        }
+
+        // Generic error response
+        res.status(500).json({ 
+            error: 'PYQ upload failed',
+            details: process.env.NODE_ENV === 'development' ? err.message : undefined
+        });
     }
-  });
+});
+
+
+
+
+Router.get('/pyqs', async (req, res) => {
+  try {
+    const { title, year, branch, subject } = req.query;
+
+    const filter = {};
+    if (title) filter.title = title;
+    if (year) filter.year = year;
+    if (branch) filter.branch = branch;
+    if (subject) filter.subject = subject;
+
+    const pyqs = await pyqModel.find(filter)
+      .populate('user', 'name email') // Changed from uploadedBy to uploader to match your schema
+      .exec();
+
+    res.status(200).json(pyqs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch PYQs', details: err.message });
+  }
+});
+
 
 
   Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
@@ -194,13 +278,53 @@ Router.post('/login', async (req, res) => {
     }
   });
 
-  Router.get('/Profile',async (req,res)=>{
+  Router.get('/my-notes', async (req, res) => {
     try {
-      //  console.log(req.body.email,req.body.name)
-      console.log(req.body)
-       res.status(200).json({ message: 'profile updated' });
-    } catch (error) {
+      const { email } = req.query;
+      console.log("the email is that getting ",email)
+  
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+  
+      // Find user and populate their uploaded notes
+      const user = await userModel.findOne({ email }).populate('notes');
+  
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+  
+      res.status(200).json(user.notes);
+    } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Failed to fetch profile', details: err.message });
+      res.status(500).json({ error: 'Failed to fetch notes', details: err.message });
     }
-  })
+  });
+
+  Router.delete('/delete-note/:noteId', async (req, res) => {
+    try {
+      const { noteId } = req.params;
+  
+      // Find the note
+      const note = await notesModel.findById(noteId);
+      if (!note) {
+        return res.status(404).json({ error: 'Note not found' });
+      }
+  
+      // Delete the note
+      await notesModel.findByIdAndDelete(noteId);
+  
+      // Remove note reference from user's notes array
+      await userModel.updateOne(
+        { notes: noteId },
+        { $pull: { notes: noteId } }
+      );
+  
+      res.status(200).json({ message: 'Note deleted successfully' });
+    } catch (err) {
+      console.error('Error deleting note:', err);
+      res.status(500).json({ error: 'Failed to delete note', details: err.message });
+    }
+  });
+  
+  

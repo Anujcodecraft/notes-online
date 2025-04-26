@@ -43,6 +43,8 @@ const UploadPyqsPage = () => {
     });
   };
 
+  const {currentUser} = useAuth()
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -60,15 +62,18 @@ const UploadPyqsPage = () => {
     data.append('subject', formData.subject);
     data.append('title', formData.title);
     data.append('file', formData.file);
+    data.append('email',currentUser.emailtoSend)
 
     try {
-      const response = await fetch('/pyqs/upload', {
+      const response = await fetch('http://localhost:3000/upload-pyqs', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: data
       });
+
+      console.log("The response is ",response)
 
       if (!response.ok) {
         const errorData = await response.json();
