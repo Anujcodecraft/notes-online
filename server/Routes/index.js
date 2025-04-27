@@ -9,6 +9,7 @@ import multer from 'multer';
 import { storage } from '../cloudinary/index.js';
 import bcrypt from "bcrypt"
 export const Router = express.Router();
+import nodemailer from 'nodemailer'
 
 const upload = multer({ storage });
 
@@ -423,3 +424,81 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
       res.status(500).json({ error: 'Failed to delete pyq', details: err.message });
     }
   });
+
+
+  const otpStorage = new Map();
+
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+  
+  const sendOtpEmail = async (email, otp) => {
+    const mailOptions = {
+      from: process.env.SMTP_EMAIL,
+      to: email,
+      subject: otp,
+      html: `<p>Your OTP code is: <b>${otp}</b></p><p>It is valid for the next 5 minutes.</p>`,
+    };
+  
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent: ' + info.response);
+      return true;
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return false;
+    }
+  };
+  
+  
+  const generateOtp = (userid) => {
+    try {
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      otpStorage.set(userid, { otp, expiresAt: Date.now() + 300000 });
+      return otp;
+    } catch (error) {
+      console.log(error.message);
+      return false;
+    }
+  }
+
+
+  Router.post('/send-otp', async (req, res)=>{
+    try {
+      const {email} = req.body;
+      const otp = generateOtp(email);
+      // console.log("otp is ", otpStorage.get(email))
+      const response = await sendOtpEmail(email, otp);
+      if(!response){
+        return res.status(401).json({message:"Failed to Send OTP"});
+      }
+      return res.status(200).json({message:"Sent OTP"})
+    } catch (error) {
+      console.log(error.message)
+    }
+  })
+
+  Router.post('/verify-otp', async(req, res)=>{
+    try {
+      const { email, otp } = req.body;
+      // console.log("otp storage ", otpStorage)
+      const savedOtp = otpStorage.get(email);
+      // console.log("otps are ", savedOtp, otp)
+      if(String(savedOtp['otp'])===otp){
+        return res.status(200).json({message:"Verified"});
+      }
+      return res.status(401).json({message:"Wrong Otp"})
+    } catch (error) {
+      console.log(error)
+    }
+  })
