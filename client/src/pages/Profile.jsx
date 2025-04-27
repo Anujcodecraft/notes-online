@@ -20,14 +20,14 @@ export default function UserPagePreview() {
         // Fetch notes count
         const notesRes = await axios.get(`http://localhost:3000/my-notes?email=${currentUser.emailtoSend}`);
         // Fetch PYQs count (you'll need to implement this endpoint)
-        // const pyqsRes = await axios.get(`http://localhost:3000/my-pyqs?email=${currentUser.emailtoSend}`);
+        const pyqsRes = await axios.get(`http://localhost:3000/my-pyqs?email=${currentUser.emailtoSend}`);
         // Fetch solutions count (you'll need to implement this endpoint)
         // const solutionsRes = await axios.get(`http://localhost:3000/my-solutions?email=${currentUser.emailtoSend}`);
         
         setStats({
           ...stats,
           notesUploaded: notesRes.data.length,
-          // pyqsUploaded: pyqsRes.data.length,
+          pyqsUploaded: pyqsRes.data.length,
           // solutionsUploaded: solutionsRes.data.length
         });
       } catch (err) {
@@ -171,7 +171,6 @@ export default function UserPagePreview() {
               </div>
             </div>
 
-            {/* Recent Activity Section */}
 
           </div>
         </motion.div>

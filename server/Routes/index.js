@@ -186,7 +186,7 @@ Router.post('/login', async (req, res) => {
         // Update User Model
         await userModel.findByIdAndUpdate(
             UUser._id, 
-            { $push: { uploadedPYQs: pyq._id } },
+            { $push: { pyqs: pyq._id } },
             { new: true, runValidators: true }
         ).catch(err => {
             console.error('Failed to update user:', err);
@@ -230,8 +230,6 @@ Router.post('/login', async (req, res) => {
 });
 
 
-
-
 Router.get('/pyqs', async (req, res) => {
   try {
     const { title, year, branch, subject } = req.query;
@@ -255,28 +253,42 @@ Router.get('/pyqs', async (req, res) => {
 
 
 
-  Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
-    try {
-      const noteId = req.params.id;
-      const userId = req.user.id;
-  
-      const note = await notesModel.findById(noteId);
-  
-      if (!note) return res.status(404).json({ error: 'Note not found' });
-  
-      if (note.upvotes.includes(userId)) {
-        return res.status(400).json({ error: 'You have already upvoted this note' });
-      }
-  
-      note.upvotes.push(userId);
-      await note.save();
-  
-      res.status(200).json({ message: 'Note upvoted successfully', totalUpvotes: note.upvotes.length });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Failed to upvote note', details: err.message });
+Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
+  try {
+    const noteId = req.params.id;
+    const email = req.body.email;
+    const user = await userModel.findOne({ email: email });
+    // From middleware (decoded JWT)
+    console.log("we are at uploaded notes")
+
+    const User = await userModel.findById(user._id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  });
+
+    const note = await notesModel.findById(noteId);
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found' });
+    }
+
+    // Check if the user has already upvoted
+    if (note.upvotes.some(vote => vote.equals(user._id))) {
+      return res.status(400).json({ error: 'You have already upvoted this note' });
+    }
+
+    note.upvotes.push(user._id);
+    await note.save();
+
+    res.status(200).json({
+      message: 'Note upvoted successfully',
+      totalUpvotes: note.upvotes.length
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to upvote note', details: err.message });
+  }
+});
+
 
   Router.get('/my-notes', async (req, res) => {
     try {
@@ -298,6 +310,31 @@ Router.get('/pyqs', async (req, res) => {
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: 'Failed to fetch notes', details: err.message });
+    }
+  });
+
+
+  Router.get('/my-pyqs', async (req, res) => {
+    try {
+      const { email } = req.query;
+      console.log("the email is that getting ",email)
+  
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+  
+      // Find user and populate their uploaded notes
+      console.log("here at pos2 ")
+      const user = await userModel.findOne({ email }).populate('pyqs');
+       console.log("the user is ",user)
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      console.log("now i am herer at current ")
+      res.status(200).json(user.pyqs);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch pyqs', details: err.message });
     }
   });
 
@@ -327,4 +364,62 @@ Router.get('/pyqs', async (req, res) => {
     }
   });
   
+  Router.post('/pyqs/:id/upvote', mainmiddleware, async (req, res) => {
+    try {
+      const pyqId = req.params.id;
+      const email = req.body.email; // From the authenticated user
+
+     
+
+      const user = await userModel.findOne({ email: email });
   
+      const pyq = await pyqModel.findById(pyqId);
+  
+      if (!pyq) return res.status(404).json({ error: 'PYQ not found' });
+  
+      // Check if the user has already upvoted
+      if (pyq.upvotes.includes(user._id)) {
+        return res.status(400).json({ error: 'You have already upvoted this PYQ' });
+      }
+      console.log(user._id)
+  
+      // Add user ID to upvotes array
+      pyq.upvotes.push(user._id);
+      await pyq.save();
+  
+      res.status(200).json({
+        message: 'PYQ upvoted successfully',
+        totalUpvotes: pyq.upvotes.length
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to upvote PYQ', details: err.message });
+    }
+  });
+
+
+  Router.delete('/delete-pyq/:pyqId', async (req, res) => {
+    try {
+      const { pyqId } = req.params;
+  
+      // Find the note
+      const pyq = await pyqModel.findById(pyqId);
+      if (!pyq) {
+        return res.status(404).json({ error: 'pyq not found' });
+      }
+  
+      // Delete the note
+      await pyqModel.findByIdAndDelete(pyqId);
+  
+      // Remove note reference from user's notes array
+      await pyqModel.updateOne(
+        { pyqs: pyqId },
+        { $pull: { pyqs: pyqId } }
+      );
+  
+      res.status(200).json({ message: 'pyq deleted successfully' });
+    } catch (err) {
+      console.error('Error deleting pyq:', err);
+      res.status(500).json({ error: 'Failed to delete pyq', details: err.message });
+    }
+  });

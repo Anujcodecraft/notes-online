@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "notes",
   }],
+  pyqs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "pyqs",
+  }],
   
   upvotes: { 
     type: [mongoose.Schema.Types.ObjectId], 

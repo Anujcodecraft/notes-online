@@ -13,6 +13,7 @@ import { AuthProvider } from './context/AuthContext';
 import Anuj from './pages/Anuj';
 import Profile from './pages/Profile';
 import MyNotes from './pages/MyNotes';
+import MyPyqs from './pages/MyPyqs';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -31,9 +32,7 @@ function App() {
             <Route path="/upload-pyqs" element={<UploadPyqsPage />} />
             <Route path="/Profile" element={<Profile />} />
             <Route path="/my-notes" element={<MyNotes />} />
-            
-            
-            
+            <Route path="/my-pyqs" element={<MyPyqs />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
