@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 import React from 'react';
 
 
@@ -49,7 +50,7 @@ const LoginPage = () => {
       // Assuming the API returns user data and token
       login(data.user, data.token);
      
-      navigate('/');
+       navigate('/');
     } catch (err) {
       setError(err.message || 'Invalid email or password');
     } finally {

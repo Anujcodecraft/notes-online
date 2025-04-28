@@ -12,9 +12,8 @@ const PyqsPage = () => {
     subject: '',
     title: ''
   });
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, currentUser } = useAuth();
 
-  // Options for filters
   const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
   const branches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
   const subjects = ['Data Structures', 'Algorithms', 'Database', 'Networks', 'OS', 'TOC', 'AI', 'ML'];
@@ -24,6 +23,10 @@ const PyqsPage = () => {
     fetchPyqs();
   }, [filters]);
 
+  const handleViewPDF = (fileUrl) => {
+    window.open(fileUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const fetchPyqs = async () => {
     setLoading(true);
     try {
@@ -32,19 +35,18 @@ const PyqsPage = () => {
       if (filters.branch) queryParams.append('branch', filters.branch);
       if (filters.subject) queryParams.append('subject', filters.subject);
       if (filters.title) queryParams.append('title', filters.title);
-      
+
       const response = await fetch(`http://localhost:3000/pyqs?${queryParams.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch PYQsss');
-      }
+      if (!response.ok) throw new Error('Failed to fetch PYQs');
       
       const data = await response.json();
-      // Ensure each PYQ has uploader info
+
       const processedData = data.map(pyq => ({
         ...pyq,
-        uploadedBy: pyq.uploader || { name: 'Unknown' } // Fallback if uploader is missing
+        uploadedBy: pyq.uploader || { name: 'Unknown' },
+        upvotes: pyq.upvotes || [],
       }));
+
       setPyqs(processedData);
     } catch (err) {
       setError(err.message || 'Something went wrong');
@@ -61,167 +63,159 @@ const PyqsPage = () => {
   };
 
   const handleUpvote = async (id) => {
-    if (!isAuthenticated) {
-      return window.alert('Please login to upvote');
-    }
-    
     try {
-      const response = await fetch(`http://localhost:3000/notes/${id}/upvote`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to upvote.');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3000/pyqs/${id}/upvote`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ email: currentUser.email })
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to upvote');
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPyqs(prevPyqs =>
+          prevPyqs.map(pyq => 
+            pyq._id === id ? { ...pyq, upvotes: [...pyq.upvotes, 'dummyUser'] } : pyq
+          )
+        );
+      } else {
+        alert(`Error: ${data.error}`);
       }
-      
-      // Update the pyqs list to reflect the new upvote count
-      setPyqs(pyqs.map(pyq => 
-        pyq._id === id ? { ...pyq, upvotes: pyq.upvotes + 1 } : pyq
-      ));
-    } catch (err) {
-      setError(err.message || 'Something went wrong');
+    } catch (error) {
+      console.error('Error during upvote:', error);
+      alert('Something went wrong while upvoting.');
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-green-600 mb-6">Previous Year Questions (PYQs)</h1>
-      
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h2 className="text-lg font-semibold mb-4">Filter PYQs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="year">
-              Year
-            </label>
-            <select
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="year"
-              name="year"
-              value={filters.year}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Years</option>
-              {years.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="branch">
-              Branch
-            </label>
-            <select
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="branch"
-              name="branch"
-              value={filters.branch}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Branches</option>
-              {branches.map(branch => (
-                <option key={branch} value={branch}>{branch}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="subject">
-              Subject
-            </label>
-            <select
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="subject"
-              name="subject"
-              value={filters.subject}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Subjects</option>
-              {subjects.map(subject => (
-                <option key={subject} value={subject}>{subject}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-              Exam Type
-            </label>
-            <select
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="title"
-              name="title"
-              value={filters.title}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Types</option>
-              {titles.map(title => (
-                <option key={title} value={title}>{title}</option>
-              ))}
-            </select>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            Previous Year Questions
+          </h1>
+          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+            Access exam papers from previous years to help you prepare better
+          </p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            Filter PYQs
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { label: 'Academic Year', name: 'year', options: years },
+              { label: 'Branch', name: 'branch', options: branches },
+              { label: 'Subject', name: 'subject', options: subjects },
+              { label: 'Exam Type', name: 'title', options: titles }
+            ].map((filter) => (
+              <div key={filter.name}>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={filter.name}>
+                  {filter.label}
+                </label>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md border"
+                  id={filter.name}
+                  name={filter.name}
+                  value={filters[filter.name]}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All {filter.label}</option>
+                  {filter.options.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-      
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-      
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-        </div>
-      ) : pyqs.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pyqs.map((pyq) => (
-            <div key={pyq._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-semibold text-gray-800">{pyq.subject}</h3>
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                    {pyq.title}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Year: {pyq.year}</p>
-                <p className="text-sm text-gray-600">Branch: {pyq.branch}</p>
-                <p className="text-sm text-gray-600">Uploaded by: {pyq.uploadedBy.name}</p>
-                
-                <div className="mt-4 flex justify-between items-center">
-                  <a
-                    href={pyq.fileurl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded"
-                  >
-                    Download
-                  </a>
-                  
-                  <button
-                    onClick={() => handleUpvote(pyq._id)}
-                    className="flex items-center text-gray-600 hover:text-green-600"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
-                    </svg>
-                    <span>{pyq.upvotes || 0}</span>
-                  </button>
+
+        {/* Error or Loading */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
+          </div>
+        ) : pyqs.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pyqs.map((pyq) => (
+              <div key={pyq._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{pyq.subject}</h3>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2 ${
+                        pyq.title === 'Mini' ? 'bg-blue-100 text-blue-800' :
+                        pyq.title === 'Mid' ? 'bg-purple-100 text-purple-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {pyq.title} Semester
+                      </span>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => handleUpvote(pyq._id)}
+                        className="flex items-center space-x-1 text-gray-500 hover:text-green-600 transition-colors"
+                        title="Upvote this PYQ"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        </svg>
+                        <span>{pyq.upvotes.length}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 space-y-2 text-gray-600">
+                    <div>Year: {pyq.year}</div>
+                    <div>Branch: {pyq.branch}</div>
+                    <div>Uploaded by: {pyq.uploadedBy.name}</div>
+                  </div>
+
+                  <div className="mt-6">
+                    <button
+                      onClick={() => handleViewPDF(pyq.fileurl)}
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      View PDF
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+            <h3 className="text-lg font-medium text-gray-900">No PYQs found</h3>
+            <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+            <div className="mt-6">
+              <button
+                onClick={() => setFilters({ year: '', branch: '', subject: '', title: '' })}
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                Clear all filters
+              </button>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <h3 className="text-xl text-gray-600">No PYQs found based on your filters</h3>
-          <p className="text-gray-500 mt-2">Try adjusting your filter criteria or upload some PYQs!</p>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -21,7 +21,7 @@ export default function Navbar() {
   const menuItems = [
     { id: 'Profile', icon: User, label: 'Profile' },
     { id: 'my-notes', icon: Book, label: 'My Notes' },
-    { id: 'pyqs', icon: FileQuestion, label: 'PYQs Uploaded' },
+    { id: 'my-pyqs', icon: FileQuestion, label: 'PYQs Uploaded' },
     { id: 'solutions', icon: FileCheck, label: 'Solutions Uploaded' },
   ];
 

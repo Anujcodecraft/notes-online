@@ -25,11 +25,7 @@ const LandingPage = () => {
             </Link>
           </div>
           ):(<></>)
-        }
-           
-          
-
-
+}
           {
   isAuthenticated ? (
     <div className="mt-8 flex justify-center space-x-4">
