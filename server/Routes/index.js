@@ -232,27 +232,26 @@ Router.post('/login', async (req, res) => {
 
 
 
+// In your backend route (pyqsRoutes.js)
 Router.get('/pyqs', async (req, res) => {
   try {
     const { title, year, branch, subject } = req.query;
-
     const filter = {};
+    
     if (title) filter.title = title;
     if (year) filter.year = year;
     if (branch) filter.branch = branch;
     if (subject) filter.subject = subject;
 
     const pyqs = await pyqModel.find(filter)
-      .populate('user', 'name email') // Changed from uploadedBy to uploader to match your schema
+      .populate('uploader', 'name') // Populate the uploader field with just the name
       .exec();
 
     res.status(200).json(pyqs);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch PYQs', details: err.message });
+    res.status(500).json({ error: 'Failed to fetch PYQs' });
   }
 });
-
 
 
   Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {

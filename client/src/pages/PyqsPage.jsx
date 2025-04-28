@@ -36,14 +36,14 @@ const PyqsPage = () => {
       const response = await fetch(`http://localhost:3000/pyqs?${queryParams.toString()}`);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch PYQs');
+        throw new Error('Failed to fetch PYQsss');
       }
       
       const data = await response.json();
-      // Ensure uploadedBy exists with at least a name property
+      // Ensure each PYQ has uploader info
       const processedData = data.map(pyq => ({
         ...pyq,
-        uploadedBy: pyq.uploader || { name: 'Unknown' } // Changed from uploadedBy to uploader
+        uploadedBy: pyq.uploader || { name: 'Unknown' } // Fallback if uploader is missing
       }));
       setPyqs(processedData);
     } catch (err) {
@@ -194,7 +194,7 @@ const PyqsPage = () => {
                 
                 <div className="mt-4 flex justify-between items-center">
                   <a
-                    href={pyq.fileUrl}
+                    href={pyq.fileurl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-green-600 hover:bg-green-700 text-white py-1 px-4 rounded"
