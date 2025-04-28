@@ -26,7 +26,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/AllNotes" element={<NotesPage />} />
             <Route path="/pyqs" element={<PyqsPage />} />
             <Route path="/upload-notes" element={<UploadNotesPage/>} />
             <Route path="/upload-pyqs" element={<UploadPyqsPage />} />

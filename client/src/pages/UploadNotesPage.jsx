@@ -87,8 +87,11 @@ const UploadNotesPage = () => {
       setLoading(false);
     }
   };
+  
+  console.log(currentUser)
 
   return (
+   
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-blue-600 mb-6">Upload Notes</h1>
       
@@ -185,6 +188,10 @@ const UploadNotesPage = () => {
             </button>
           </div>
         </form>
+      </div>
+      <div className="mt-6 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+        <p className="font-medium">Note:</p>
+        <p>Only selected students are permitted to upload notes.</p>
       </div>
     </div>
   );

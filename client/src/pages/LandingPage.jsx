@@ -17,7 +17,7 @@ const LandingPage = () => {
          { isAuthenticated?(
 
           <div className="flex justify-center space-x-4">
-            <Link to="/notes" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+            <Link to="/AllNotes" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
               Browse Notes
             </Link>
             <Link to="/pyqs" className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
