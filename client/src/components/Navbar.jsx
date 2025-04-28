@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { User, Book, FileQuestion, FileCheck, LogOut, X } from 'lucide-react';
+import { User, Book, FileQuestion, FileCheck, LogOut, X, Home } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import Profile from '../pages/Profile';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     setSidebarOpen(false);
+    Navigate('/')
   };
 
   const menuItems = [
@@ -36,6 +38,23 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center">
+              {/* Added Home Button */}
+             {
+              isAuthenticated?(              <Link
+                to="/"
+                className="p-2 mr-2 rounded-full hover:bg-blue-200 transition-colors group relative"
+                aria-label="Home"
+              >
+                <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-md group-hover:bg-blue-50 transition-colors">
+                  <Home className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                </div>
+                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                
+                </span>
+              </Link>):(<></>)
+             }
+              
+
               {isAuthenticated ? (
                 <button
                   onClick={toggleSidebar}

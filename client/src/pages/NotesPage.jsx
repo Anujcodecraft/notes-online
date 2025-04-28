@@ -1,247 +1,331 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
 
 const NotesPage = () => {
-  const [filters, setFilters] = useState({ year: '', branch: '', subject: '' });
   const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [filters, setFilters] = useState({
+    year: "",
+    branch: "",
+    subject: ""
+  });
+  const { isAuthenticated, currentUser } = useAuth();
 
-  const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
-  const branches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
-  const subjects = ['Data Structures', 'Algorithms', 'Database', 'Networks', 'OS', 'TOC', 'AI', 'ML', 'Math'];
-
-  const allFiltersSelected = Boolean(filters.year && filters.branch && filters.subject);
+  const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
+  const branches = ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE"];
+  const subjects = [
+    "Data Structures",
+    "Algorithms",
+    "Database",
+    "Networks",
+    "OS",
+    "TOC",
+    "AI",
+    "ML",
+    "Math",
+  ];
 
   useEffect(() => {
-    if (!allFiltersSelected) {
-      setNotes([]);
-      return;
+    // Only fetch notes if the user is authenticated
+    if (isAuthenticated) {
+      fetchNotes();
+    } else {
+      setLoading(false);
     }
+  }, [filters, isAuthenticated]);
 
-    const fetchNotes = async () => {
-      setLoading(true);
-      setError('');
+  const handleViewPDF = (fileUrl) => {
+    window.open(fileUrl, "_blank", "noopener,noreferrer");
+  };
 
-      try {
-        const queryString = new URLSearchParams(filters).toString();
-        const res = await fetch(`http://localhost:3000/notes?${queryString}`, {
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || 'Failed to fetch notes');
-        }
-        const data = await res.json();
-        const processedNotes = data.map(note => ({
-          ...note,
-          upvotes: note.upvotes || [],
-          upvotesCount: note.upvotesCount || note.upvotes?.length || 0
-        }));
-        setNotes(processedNotes);
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setLoading(false);
+  const fetchNotes = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const queryParams = new URLSearchParams();
+      if (filters.year) queryParams.append("year", filters.year);
+      if (filters.branch) queryParams.append("branch", filters.branch);
+      if (filters.subject) queryParams.append("subject", filters.subject);
+
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:3000/notes?${queryParams.toString()}`, {
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : ""
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to fetch notes");
       }
-    };
 
-    fetchNotes();
-  }, [filters, allFiltersSelected]);
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        throw new Error("Invalid response format");
+      }
 
-  const handleFilterChange = e => {
-    const { name, value } = e.target;
-    setFilters(prev => ({ ...prev, [name]: value }));
+      const processedNotes = data.map((note) => ({
+        ...note,
+        uploadedBy: note.user || { name: "Unknown" },
+        upvotes: note.upvotes || [],
+        upvotesCount: note.upvotesCount || note.upvotes?.length || 0,
+      }));
+      setNotes(processedNotes);
+    } catch (e) {
+      console.error("Error fetching notes:", e);
+      setError(e.message || "Failed to fetch notes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value
+    });
   };
 
   const handleUpvote = async (noteId) => {
     try {
-      if (!currentUser?._id) {
-        alert('Please login to upvote notes.');
+      if (!isAuthenticated || !currentUser?.emailtoSend) {
+        alert("Please login to upvote notes.");
         return;
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        alert('Please login to upvote notes.');
+        alert("Please login to upvote notes.");
         return;
       }
 
-      // Optimistic update
+      const note = notes.find((n) => n._id === noteId);
+      if (!note) {
+        console.error("Note not found");
+        return;
+      }
+
+      const isAlreadyUpvoted = note.upvotes.includes(currentUser.emailtoSend);
+      if (isAlreadyUpvoted) {
+        alert("You have already upvoted this note.");
+        return;
+      }
+
+      // Optimistic UI update
       setNotes(prevNotes =>
         prevNotes.map(note => {
           if (note._id === noteId) {
-            const isUpvoted = note.upvotes.includes(currentUser._id);
             return {
               ...note,
-              upvotes: isUpvoted
-                ? note.upvotes.filter(id => id !== currentUser._id)
-                : [...note.upvotes, currentUser._id],
-              upvotesCount: isUpvoted ? note.upvotesCount - 1 : note.upvotesCount + 1
+              upvotes: [...note.upvotes, currentUser.emailtoSend],
+              upvotesCount: note.upvotesCount + 1,
             };
           }
           return note;
         })
       );
 
-      const response = await fetch(`http://localhost:3000/notes/${noteId}/upvote`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ userId: currentUser._id })
-      });
+      const response = await fetch(
+        `http://localhost:3000/notes/${noteId}/upvote`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ email: currentUser.emailtoSend }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to update upvote');
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update upvote");
       }
-
-      const updatedNote = await response.json();
-      setNotes(prevNotes =>
-        prevNotes.map(note =>
-          note._id === noteId
-            ? {
-                ...note,
-                upvotes: updatedNote.upvotes || note.upvotes,
-                upvotesCount: updatedNote.upvotesCount || note.upvotesCount
-              }
-            : note
-        )
-      );
     } catch (error) {
-      console.error('Upvote error:', error);
-      setError(error.message);
+      console.error("Upvote error:", error);
+      alert(error.message || "Something went wrong.");
       // Revert optimistic update on error
-      setNotes(prevNotes => [...prevNotes]);
+      fetchNotes();
     }
   };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-blue-600 mb-6">Academic Notes</h1>
+  const renderNotesContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center py-20">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+        </div>
+      );
+    }
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <FilterSelect name="year" label="Year" value={filters.year} options={years} onChange={handleFilterChange} />
-          <FilterSelect name="branch" label="Branch" value={filters.branch} options={branches} onChange={handleFilterChange} />
-          <FilterSelect name="subject" label="Subject" value={filters.subject} options={subjects} onChange={handleFilterChange} />
+    if (error) {
+      return (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      );
+    }
+
+    if (notes.length > 0) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {notes.map((note) => {
+            const hasUpvoted = currentUser?.emailtoSend
+              ? note.upvotes.includes(currentUser.emailtoSend)
+              : false;
+
+            return (
+              <div key={note._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{note.subject}</h3>
+                      <div className="mt-2 text-sm text-gray-600">
+                        <div>Year: {note.year}</div>
+                        <div>Branch: {note.branch}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleUpvote(note._id)}
+                      disabled={hasUpvoted}
+                      className={`flex items-center space-x-1 ${
+                        hasUpvoted
+                          ? "text-green-600 cursor-not-allowed"
+                          : "text-gray-500 hover:text-green-600"
+                      }`}
+                      title={hasUpvoted ? "Already upvoted" : "Upvote this note"}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill={hasUpvoted ? "currentColor" : "none"}
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                        />
+                      </svg>
+                      <span>{note.upvotesCount}</span>
+                    </button>
+                  </div>
+
+                  <div className="mt-4 text-sm text-gray-600">
+                    Uploaded by: {note.uploadedBy.name}
+                  </div>
+
+                  <div className="mt-6">
+                    <button
+                      onClick={() => handleViewPDF(note.fileurl)}
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      View PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    return (
+      <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+        <h3 className="text-lg font-medium text-gray-900">No notes found</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          {Object.values(filters).some(Boolean)
+            ? "Try adjusting your search or filter to find what you're looking for."
+            : "Please select filters to view notes."}
+        </p>
+        {Object.values(filters).some(Boolean) && (
+          <div className="mt-6">
+            <button
+              onClick={() => setFilters({ year: "", branch: "", subject: "" })}
+              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+            <h3 className="text-lg font-medium text-gray-900">Please login to view notes</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              You need to be logged in to access academic notes and study materials.
+            </p>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Prompt */}
-      {!allFiltersSelected && (
-        <p className="text-gray-600 mb-6 text-center">
-          Please select Year, Branch, and Subject to view notes.
-        </p>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+            Academic Notes
+          </h1>
+          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+            Access study materials and notes shared by students
+          </p>
         </div>
-      )}
 
-      {/* Loading */}
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+        {/* Filters */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            Filter Notes
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { label: "Academic Year", name: "year", options: years },
+              { label: "Branch", name: "branch", options: branches },
+              { label: "Subject", name: "subject", options: subjects }
+            ].map((filter) => (
+              <div key={filter.name}>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor={filter.name}>
+                  {filter.label}
+                </label>
+                <select
+                  className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
+                  id={filter.name}
+                  name={filter.name}
+                  value={filters[filter.name]}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All {filter.label}</option>
+                  {filter.options.map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
         </div>
-      ) : (
-        allFiltersSelected && (
-          notes.length > 0
-            ? <NotesGrid notes={notes} onUpvote={handleUpvote} currentUserId={currentUser?._id} />
-            : <p className="text-center text-gray-600 py-12">
-                No notes found for the selected filters.
-              </p>
-        )
-      )}
+
+        {/* Notes Content */}
+        {renderNotesContent()}
+      </div>
     </div>
+    
   );
 };
 
-const FilterSelect = ({ name, label, value, options, onChange }) => (
-  <div>
-    <label htmlFor={name} className="block text-gray-700 text-sm font-bold mb-1">
-      {label}
-    </label>
-    <select
-      id={name}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className="w-full border rounded py-2 px-3 text-gray-700 focus:outline-none"
-    >
-      <option value="">Select {label}</option>
-      {options.map(opt => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  </div>
-);
-
-const NotesGrid = ({ notes, onUpvote, currentUserId }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {notes.map(note => {
-      const upvotes = note.upvotes || [];
-      const hasUpvoted = currentUserId ? upvotes.includes(currentUserId) : false;
-      const upvotesCount = note.upvotesCount || 0;
-
-      return (
-        <div key={note._id} className="bg-white p-4 rounded shadow hover:shadow-md transition">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-lg font-semibold">{note.subject}</h3>
-              <p className="text-sm text-gray-600">Year: {note.year}</p>
-              <p className="text-sm text-gray-600">Branch: {note.branch}</p>
-            </div>
-            <button
-              onClick={() => onUpvote(note._id)}
-              disabled={!currentUserId || hasUpvoted}
-              className={`flex items-center space-x-1 ${hasUpvoted ? 'text-green-600' : 'text-gray-500 hover:text-green-600'}`}
-              title={!currentUserId ? 'Login to upvote' : hasUpvoted ? 'Already upvoted' : 'Upvote this note'}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill={hasUpvoted ? "currentColor" : "none"}
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                />
-              </svg>
-              <span>{upvotesCount}</span>
-            </button>
-          </div>
-
-          <p className="text-sm text-gray-600 mt-2">
-            Uploaded by: {note.uploadedBy?.name || 'Unknown'}
-          </p>
-
-          <div className="mt-4">
-            <a
-              href={note.fileurl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            >
-              View PDF
-            </a>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-);
-
 export default NotesPage;
+
+
+

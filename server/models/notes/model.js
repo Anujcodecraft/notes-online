@@ -20,10 +20,10 @@ const notesSchema = mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"user"
     },
-    upvotes:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"upvotes"
-    },
+  upvotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user", // referencing the users who upvoted
+  }],
     createdAt:{
         type:Date,
         default:Date.now

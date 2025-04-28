@@ -108,23 +108,27 @@ Router.post('/login', async (req, res) => {
   Router.get('/notes', async (req, res) => {
     try {
       const { subject, branch, year } = req.query;
-      console.log(subject,branch,year)
+      console.log(subject, branch, year);
   
       // Validate query params
-      if (!subject || !branch || !year) {
-        return res.status(400).json({ error: 'Subject, Branch, and Year are required.' });
-      }
-  
-      const notes = await notesModel.find({ subject, branch, year });
-
-      console.log("the notes are",notes)
-  
+      const filter = {};
+    
+      
+      if (year) filter.year = year;
+      if (branch) filter.branch = branch;
+      if (subject) filter.subject = subject;
+      
+      const notes = await notesModel.find(filter)
+      .populate('user', 'name') // Populate the uploader field with just the name
+      .exec();
+    
       res.status(200).json(notes);
     } catch (err) {
       console.log(err);
       res.status(500).json({ error: 'Failed to fetch notes', details: err.message });
     }
   });
+  
 
   const allowedTitles = ['Mini', 'Mid', 'End'];
   const allowedBranches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
@@ -231,7 +235,7 @@ Router.post('/login', async (req, res) => {
 });
 
 
-Router.get('/pyqs', async (req, res) => {
+Router.get('/pyqs',  async (req, res) => {
   try {
     const { title, year, branch, subject } = req.query;
     const filter = {};
@@ -240,11 +244,11 @@ Router.get('/pyqs', async (req, res) => {
     if (year) filter.year = year;
     if (branch) filter.branch = branch;
     if (subject) filter.subject = subject;
-
+    
     const pyqs = await pyqModel.find(filter)
-      .populate('uploader', 'name') // Populate the uploader field with just the name
-      .exec();
-
+    .populate('user', 'name') // Populate the uploader field with just the name
+    .exec();
+  
     res.status(200).json(pyqs);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch PYQs' });
@@ -257,11 +261,12 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
   try {
     const noteId = req.params.id;
     const email = req.body.email;
+    console.log("heyy")
     const user = await userModel.findOne({ email: email });
     // From middleware (decoded JWT)
-    console.log("we are at uploaded notes")
+    console.log("the name of owner are",user)
 
-    const User = await userModel.findById(user._id);
+   
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -272,8 +277,8 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
     }
 
     // Check if the user has already upvoted
-    if (note.upvotes.some(vote => vote.equals(user._id))) {
-      return res.status(400).json({ error: 'You have already upvoted this note' });
+    if (note.upvotes.includes(user._id)) {
+      return res.status(400).json({ error: 'You have already upvoted this PYQ' });
     }
 
     note.upvotes.push(user._id);
@@ -369,8 +374,8 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
       const pyqId = req.params.id;
       const email = req.body.email; // From the authenticated user
 
+      console.log("am here",email)
      
-
       const user = await userModel.findOne({ email: email });
   
       const pyq = await pyqModel.findById(pyqId);
