@@ -3,13 +3,15 @@ import { userModel } from '../models/user/model.js';
 import pyqModel from '../models/pyq/model.js'
 import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from '../utils/statuscode.js';
 import { mainmiddleware } from '../Middleware/index.js';
-import { generateToken,verifyToken } from '../services/auth.js';
+import { generateToken } from '../services/auth.js';
 import { notesModel } from '../models/notes/model.js';
 import multer from 'multer';
 import { storage } from '../cloudinary/index.js';
+import verifyGoogleToken from '../Middleware/googleAuth.js'
 import bcrypt from "bcrypt"
 export const Router = express.Router();
 import nodemailer from 'nodemailer'
+import jwt from 'jsonwebtoken'
 
 const upload = multer({ storage });
 
@@ -58,7 +60,7 @@ Router.post('/login', async (req, res) => {
       console.log(userone)
       if (!userone) return res.status(404).json({ message: 'User not found' });
   
-      const isMatch = await bcrypt.compare(password, userone.password);
+      const isMatch =  bcrypt.compare(password, userone.password);
       if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
   
       const token = generateToken(userone)
@@ -70,6 +72,33 @@ Router.post('/login', async (req, res) => {
       res.status(500).json({ error: 'Login failed', details: err.message });
     }
   });
+
+Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
+  try {
+      // console.log(req.user)
+      const { name, email, picture } = req.user;
+      let user = await userModel.findOne({ email });
+      if (!user) {
+          user = await userModel.create({
+              name,
+              email,
+              provider: "google",
+              profilePicture:picture
+          });
+          if (!user) {
+              return res.status(500).json({
+                  message: "User  creation failed",
+              });
+          }
+      }
+      const token = generateToken({_id:user._id, email:email});
+      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true}, token });
+  } catch (error) {
+      return res.status(500).json({
+          message: error.message,
+      });
+  }
+})
 
   Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, res) => {
     try {
@@ -122,7 +151,7 @@ Router.post('/login', async (req, res) => {
       if (branch) filter.branch = branch;
       if (subject) filter.subject = subject;
       
-      const notes = await notesModel.find(filter).skip(page*5).limit(5)
+      const notes = await notesModel.find(filter).skip(page*6).limit(6)
       .populate('user', 'name') // Populate the uploader field with just the name
       .exec();
     

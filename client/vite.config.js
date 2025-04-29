@@ -7,6 +7,11 @@ export default defineConfig({
     proxy: {
       // Anything starting with /notes will be proxied to backend
       '/notes': 'http://localhost:3000',
-    }
+    },
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+      // "Cross-Origin-Embedder-Policy": "require-corp",
+      'Cross-Origin-Embedder-Policy': 'unsafe-none'
+    },
   }
 })

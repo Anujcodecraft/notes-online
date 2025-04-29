@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 import React from 'react';
+import GoogleAuthButton from '../components/GoogleButton';
 
 
 const LoginPage = () => {
@@ -114,6 +115,7 @@ const LoginPage = () => {
             </div>
           </form>
           
+          <GoogleAuthButton />
           <div className="text-center mt-4">
             <p className="text-sm text-gray-600">
               Don't have an account? 

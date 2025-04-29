@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    // required: true,
   },
   upvotes: {
     type: mongoose.Schema.Types.ObjectId,
@@ -54,6 +54,11 @@ const userSchema = new mongoose.Schema({
   verified: {
     type: Boolean,
     default: false,
+  },
+  provider:{type:String, default:"local"},
+  profilePicture:{
+    type:String,
+    default:null
   },
 });
 

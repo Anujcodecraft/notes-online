@@ -6,6 +6,7 @@ import axios from 'axios';
 
 export default function UserPagePreview() {
   const { currentUser } = useAuth();
+  console.log("current user", currentUser)
   const [stats, setStats] = useState({
     notesUploaded: 0,
     pyqsUploaded: 0,
