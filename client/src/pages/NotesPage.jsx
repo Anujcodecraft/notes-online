@@ -13,6 +13,7 @@ const NotesPage = () => {
     subject: ""
   });
   const { isAuthenticated, currentUser } = useAuth();
+  console.log("page value is ", page, hasMore)
 
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   const branches = ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE"];
@@ -174,6 +175,7 @@ const NotesPage = () => {
 
   const handlePrevPage = () => {
     setPage(prevPage => Math.max(0, prevPage - 1));
+    setHasMore(true);
   };
 
   const renderNotesContent = () => {
@@ -282,23 +284,44 @@ const NotesPage = () => {
     }
 
     return (
-      <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-        <h3 className="text-lg font-medium text-gray-900">No notes found</h3>
-        <p className="mt-1 text-sm text-gray-500">
-          {Object.values(filters).some(Boolean)
-            ? "Try adjusting your search or filter to find what you're looking for."
-            : "Please select filters to view notes."}
-        </p>
-        {Object.values(filters).some(Boolean) && (
-          <div className="mt-6">
-            <button
-              onClick={() => setFilters({ year: "", branch: "", subject: "" })}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Clear all filters
-            </button>
-          </div>
-        )}
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900">No notes found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            {Object.values(filters).some(Boolean)
+              ? "Try adjusting your search or filter to find what you're looking for."
+              : "Please select filters to view notes."}
+          </p>
+          {Object.values(filters).some(Boolean) && (
+            <div className="mt-6">
+              <button
+                onClick={() => setFilters({ year: "", branch: "", subject: "" })}
+                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </div>
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-8">
+          <button
+            onClick={handlePrevPage}
+            disabled={page === 0}
+            className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">Page {page + 1}</span>
+          <button
+            onClick={handleNextPage}
+            disabled={!hasMore}
+            className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+          >
+            Next
+          </button>
+        </div>
+
       </div>
     );
   };
