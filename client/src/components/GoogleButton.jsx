@@ -18,6 +18,7 @@ const GoogleAuthButton = () => {
   };
 
   const buttonStyle = {
+    margin:"auto",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",

@@ -60,24 +60,24 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center items-center px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
+    <div className="min-h-screen bg-gray-50 flex justify-center items-center px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-6 sm:p-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
           
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm sm:text-base">
               {error}
             </div>
           )}
           
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div>
+              <label className="block text-gray-700 text-sm sm:text-base font-medium mb-1 sm:mb-2" htmlFor="email">
                 Email
               </label>
               <input
-                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 id="email"
                 name="email"
                 type="email"
@@ -88,12 +88,12 @@ const LoginPage = () => {
               />
             </div>
             
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+            <div>
+              <label className="block text-gray-700 text-sm sm:text-base font-medium mb-1 sm:mb-2" htmlFor="password">
                 Password
               </label>
               <input
-                className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 id="password"
                 name="password"
                 type="password"
@@ -104,9 +104,9 @@ const LoginPage = () => {
               />
             </div>
             
-            <div className="flex items-center justify-between">
+            <div>
               <button
-                className="bg-blue-600 w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                 type="submit"
                 disabled={loading}
               >
@@ -115,11 +115,25 @@ const LoginPage = () => {
             </div>
           </form>
           
-          <GoogleAuthButton />
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
-              Don't have an account? 
-              <a href="/signup" className="text-blue-600 hover:underline ml-1">
+          <div className="mt-4 sm:mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 sm:mt-6 w-full">
+              <GoogleAuthButton className="w-full" />
+            </div>
+          </div>
+          
+          <div className="mt-4 sm:mt-6 text-center">
+            <p className="text-sm sm:text-base text-gray-600">
+              Don't have an account?{' '}
+              <a href="/signup" className="font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200">
                 Sign up
               </a>
             </p>
