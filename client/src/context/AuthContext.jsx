@@ -7,9 +7,25 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  function isJSON(str) {
+    try {
+      const parsed = JSON.parse(str);
+      // Optionally check if result is an object or array
+      return typeof parsed === 'object' && parsed !== null;
+    } catch (e) {
+      return false;
+    }
+  }
+  
 
   useEffect(() => {
     // Check if user is logged in
+    const storedUser = localStorage.getItem('user');
+    if(!isJSON(storedUser)){
+      localStorage.removeItem('user');
+      setLoading(false);
+      return;
+    }
     const user = localStorage.getItem('user');
     if (user && user !== "undefined") {
       // user.date=Date.now()
