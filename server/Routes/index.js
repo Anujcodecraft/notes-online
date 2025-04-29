@@ -112,17 +112,17 @@ Router.post('/login', async (req, res) => {
   Router.get('/notes', mainmiddleware, async (req, res) => {
     try {
       const { subject, branch, year } = req.query;
-      console.log(subject, branch, year);
-  
+
       // Validate query params
       const filter = {};
     
+      const page = parseInt(req.query.page) || 0;
       
       if (year) filter.year = year;
       if (branch) filter.branch = branch;
       if (subject) filter.subject = subject;
       
-      const notes = await notesModel.find(filter)
+      const notes = await notesModel.find(filter).skip(page*5).limit(5)
       .populate('user', 'name') // Populate the uploader field with just the name
       .exec();
     
