@@ -147,23 +147,26 @@
 //   );
 // }
 
-
 import { useState } from 'react';
-import { User, Book, FileQuestion, FileCheck, LogOut, X, Home } from 'lucide-react';
+import { User, Book, FileQuestion, FileCheck, LogOut, X, Home, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
-import Profile from '../pages/Profile';
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import manitLogo from '../assets/manit-logo.png'; // You'll need to add this image to your assets
+import manitLogo from '../assets/manit-logo.png';
+import React from 'react';
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const handleLogout = () => {
@@ -182,7 +185,7 @@ export default function Navbar() {
   return (
     <>
       {/* Navbar */}
-      <header className="bg-blue-100 shadow-md fixed top-0 w-full z-50 mb-28">
+      <header className="bg-blue-100 shadow-md fixed top-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-4">
@@ -190,16 +193,17 @@ export default function Navbar() {
               <img 
                 src={manitLogo} 
                 alt="MANIT Logo" 
-                className="h-13 w-13 object-contain"
+                className="h-12 w-12 object-contain"
               />
               
               {/* Portal Name */}
-              <Link to="/" className="text-2xl font-bold text-blue-700">
+              <Link to="/" className="text-xl md:text-2xl font-bold text-blue-700">
                 ManitStudyPortal
               </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
               {/* About and Contact Us buttons */}
               {isAuthenticated && (
                 <>
@@ -258,11 +262,76 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            {/* Mobile Hamburger Menu */}
+            <div className="md:hidden flex items-center">
+              <button
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-full hover:bg-blue-200 transition-colors"
+                aria-label="Open mobile menu"
+              >
+                <Menu className="h-6 w-6 text-blue-600" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              {isAuthenticated && (
+                <>
+                  <Link
+                    to="/About"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:text-blue-800"
+                    onClick={toggleMobileMenu}
+                  >
+                    About
+                  </Link>
+                  <Link
+                    to="/ContactUs"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:text-blue-800"
+                    onClick={toggleMobileMenu}
+                  >
+                    Contact Us
+                  </Link>
+                </>
+              )}
+              {!isAuthenticated && (
+                <>
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
+                    onClick={toggleMobileMenu}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
+                    onClick={toggleMobileMenu}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+              {isAuthenticated && (
+                <button
+                  onClick={() => {
+                    toggleSidebar();
+                    toggleMobileMenu();
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  User Menu
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
-      {/* Rest of the sidebar and overlay code remains the same */}
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 right-0 z-40 w-64 bg-gray-900 shadow-lg transform ${
@@ -314,10 +383,13 @@ export default function Navbar() {
       </div>
 
       {/* Overlay */}
-      {sidebarOpen && (
+      {(sidebarOpen || mobileMenuOpen) && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={toggleSidebar}
+          onClick={() => {
+            setSidebarOpen(false);
+            setMobileMenuOpen(false);
+          }}
         ></div>
       )}
     </>
