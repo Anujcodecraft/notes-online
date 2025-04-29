@@ -49,7 +49,7 @@ const GoogleAuthButton = () => {
     try {
       await authenticationPopup();
       const googleToken = await getGoogleToken();
-      const response = await axios.post('import.meta.env.VITE_BASE_URL_BACKEND/google-auth', {}, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL_BACKEND}/google-auth`, {}, {
         headers:{
             authorization:`Bearer ${googleToken}`
         }
