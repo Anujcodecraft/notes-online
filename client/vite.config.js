@@ -13,5 +13,10 @@ export default defineConfig({
       // "Cross-Origin-Embedder-Policy": "require-corp",
       'Cross-Origin-Embedder-Policy': 'unsafe-none'
     },
+  },
+  build: {
+    rollupOptions: {
+      external: ['@rollup/rollup-linux-x64-gnu']  // prevent bundling
+    }
   }
 })
