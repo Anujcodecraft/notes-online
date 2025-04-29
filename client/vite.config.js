@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       // Anything starting with /notes will be proxied to backend
-      '/notes': 'http://localhost:3000',
+      '/notes': import.meta.env.VITE_BASE_URL_BACKEND,
     },
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin-allow-popups",

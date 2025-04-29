@@ -36,7 +36,7 @@ const PyqsPage = () => {
       if (filters.subject) queryParams.append('subject', filters.subject);
       if (filters.title) queryParams.append('title', filters.title);
 
-      const response = await fetch(`http://localhost:3000/pyqs?${queryParams.toString()}`);
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/pyqs?${queryParams.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch PYQs');
       
       const data = await response.json();
@@ -70,7 +70,7 @@ const PyqsPage = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:3000/pyqs/${id}/upvote`, {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/pyqs/${id}/upvote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

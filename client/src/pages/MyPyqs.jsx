@@ -15,7 +15,7 @@ const MyPyqs = () => {
       useEffect(() => {
           const fetchPyqs = async () => {
             try {
-              const res = await axios.get(`http://localhost:3000/my-pyqs?email=${currentUser.emailtoSend}`);
+              const res = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-pyqs?email=${currentUser.emailtoSend}`);
               setPyqs(res.data);
             } catch (err) {
               console.error('Error fetching notes:', err);
@@ -31,7 +31,7 @@ const MyPyqs = () => {
         // const handleDelete = async (pyqId) => {
         //     setDeletingId(pyqId);
         //     try {
-        //       await axios.delete(`http://localhost:3000/delete-pyq/${pyqId}`);
+        //       await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`);
         //       setPyqs(pyqs.filter(pyq => pyq._id !== pyqId));
         //     } catch (err) {
         //       console.error('Failed to delete pyq:', err);
@@ -48,7 +48,7 @@ const MyPyqs = () => {
       
           setDeletingId(pyqId);
           try {
-            await axios.delete(`http://localhost:3000/delete-pyq/${pyqId}`);
+            await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`);
             setPyqs(pyqs.filter(pyq => pyq._id !== pyqId));
             toast.success('PYQ deleted successfully');
           } catch (err) {

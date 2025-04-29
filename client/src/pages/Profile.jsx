@@ -19,11 +19,11 @@ export default function UserPagePreview() {
     const fetchUserStats = async () => {
       try {
         // Fetch notes count
-        const notesRes = await axios.get(`http://localhost:3000/my-notes?email=${currentUser.emailtoSend}`);
+        const notesRes = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-notes?email=${currentUser.emailtoSend}`);
         // Fetch PYQs count (you'll need to implement this endpoint)
-        const pyqsRes = await axios.get(`http://localhost:3000/my-pyqs?email=${currentUser.emailtoSend}`);
+        const pyqsRes = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-pyqs?email=${currentUser.emailtoSend}`);
         // Fetch solutions count (you'll need to implement this endpoint)
-        // const solutionsRes = await axios.get(`http://localhost:3000/my-solutions?email=${currentUser.emailtoSend}`);
+        // const solutionsRes = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-solutions?email=${currentUser.emailtoSend}`);
         
         setStats({
           ...stats,

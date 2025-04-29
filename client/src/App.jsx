@@ -14,6 +14,8 @@ import Anuj from './pages/Anuj';
 import Profile from './pages/Profile';
 import MyNotes from './pages/MyNotes';
 import MyPyqs from './pages/MyPyqs';
+import About from './pages/About'
+import ContactUs from './pages/ContactUs'
 function App() {
   const [count, setCount] = useState(0)
 
@@ -33,6 +35,9 @@ function App() {
             <Route path="/Profile" element={<Profile />} />
             <Route path="/my-notes" element={<MyNotes />} />
             <Route path="/my-pyqs" element={<MyPyqs />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/ContactUs" element={<ContactUs />} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

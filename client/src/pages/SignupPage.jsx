@@ -58,7 +58,7 @@
 //     setErrors({});
 
 //     try {
-//       const response = await fetch('http://localhost:3000/signup', {
+//       const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/signup`, {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json'
@@ -264,7 +264,7 @@ const SignupPage = () => {
     
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/send-otp', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/send-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -295,7 +295,7 @@ const SignupPage = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/verify-otp', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -343,7 +343,7 @@ const SignupPage = () => {
       
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/signup', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/signup`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

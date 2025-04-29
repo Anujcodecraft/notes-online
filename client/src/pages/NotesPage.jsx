@@ -61,7 +61,7 @@ const NotesPage = () => {
       queryParams.append("page", pageNum);
 
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:3000/notes?${queryParams.toString()}`, {
+      const res = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/notes?${queryParams.toString()}`, {
         headers: { 
           "Content-Type": "application/json",
           "Authorization": token ? `Bearer ${token}` : ""
@@ -145,7 +145,7 @@ const NotesPage = () => {
       );
 
       const response = await fetch(
-        `http://localhost:3000/notes/${noteId}/upvote`,
+        `${import.meta.env.VITE_BASE_URL_BACKEND}/notes/${noteId}/upvote`,
         {
           method: "POST",
           headers: {

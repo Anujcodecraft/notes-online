@@ -65,7 +65,7 @@ const UploadPyqsPage = () => {
     data.append('email',currentUser.emailtoSend)
 
     try {
-      const response = await fetch('http://localhost:3000/upload-pyqs', {
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/upload-pyqs`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

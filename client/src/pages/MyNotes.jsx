@@ -14,7 +14,7 @@ function MyNotes() {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/my-notes?email=${currentUser.emailtoSend}`);
+        const res = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-notes?email=${currentUser.emailtoSend}`);
         setNotes(res.data);
       } catch (err) {
         console.error('Error fetching notes:', err);
@@ -30,7 +30,7 @@ function MyNotes() {
   const handleDelete = async (noteId) => {
     setDeletingId(noteId);
     try {
-      await axios.delete(`http://localhost:3000/delete-note/${noteId}`);
+      await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-note/${noteId}`);
       setNotes(notes.filter(note => note._id !== noteId));
     } catch (err) {
       console.error('Failed to delete note:', err);
