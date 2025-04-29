@@ -19,3 +19,10 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
+  },
+  build: {
+    rollupOptions: {
+      external: ['@rollup/rollup-linux-x64-gnu']  // prevent bundling
+    }
+  }
+})
