@@ -108,9 +108,9 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
       // Find the user by email
       const UUser = await userModel.findOne({ email });
 
-      if ( UUser.role !== 'uploader') {
-        return res.status(403).json({ error: 'Approval required for uploading' });
-      }
+      // if ( UUser.role !== 'uploader') {
+      //   return res.status(403).json({ error: 'Approval required for uploading' });
+      // }
   
       if (!UUser) {
         return res.status(404).json({ error: 'User not found' });
@@ -207,9 +207,9 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
         // Find user by email from authenticated request
         const UUser = await userModel.findOne({ email });
         
-      if ( UUser.role !== 'uploader') {
-        return res.status(403).json({ error: 'Approval required for uploading' });
-      }
+      // if ( UUser.role !== 'uploader') {
+      //   return res.status(403).json({ error: 'Approval required for uploading' });
+      // }
         if (!UUser) {
             return res.status(404).json({ message: "User not found" });
         }
