@@ -15,6 +15,6 @@ export const mainmiddleware = (req, res, next) => {
   }
 
   req.user = result;
-  
+  console.log("result in middleware ", req.user)
   next();
 };

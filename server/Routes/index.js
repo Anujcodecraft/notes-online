@@ -100,43 +100,44 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
   }
 })
 
-  Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, res) => {
-    try {
-      console.log("Received upload request");
-      const { year, branch, subject, email } = req.body;
-  
-      // Find the user by email
-      const UUser = await userModel.findOne({ email });
+Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, res) => {
+  try {
+    console.log(req.file);
+    console.log("Received upload request");
+    const { year, branch, subject, email } = req.body;
 
-      // if ( UUser.role !== 'uploader') {
-      //   return res.status(403).json({ error: 'Approval required for uploading' });
-      // }
-  
-      if (!UUser) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Create note
-      const note = await notesModel.create({
-        year,
-        branch,
-        subject,
-        user: UUser._id,
-        fileurl: req.file.path,
-      });
-      console.log("the uploader id is as follows",note.user)
-  
-      // Add note ID to user's notes array
-      await userModel.findByIdAndUpdate(UUser._id, {
-        $push: { notes: note._id },
-      });
-  
-      res.status(201).json(note);
-    } catch (err) {
-      console.error(err);
-      res.status(400).json({ error: 'Note upload failed', details: err.message });
+    // Find the user by email
+    const UUser = await userModel.findOne({ email });
+
+    // if ( UUser.role !== 'uploader') {
+    //   return res.status(403).json({ error: 'Approval required for uploading' });
+    // }
+
+    if (!UUser) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  });
+
+    // Create note
+    const note = await notesModel.create({
+      year,
+      branch,
+      subject,
+      user: UUser._id,
+      fileurl: req.file.path,
+    });
+    console.log("the uploader id is as follows",note.user)
+
+    // Add note ID to user's notes array
+    await userModel.findByIdAndUpdate(UUser._id, {
+      $push: { notes: note._id },
+    });
+
+    res.status(201).json(note);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: 'Note upload failed', details: err.message });
+  }
+});
   
   Router.get('/notes', mainmiddleware, async (req, res) => {
     try {

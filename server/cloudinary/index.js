@@ -15,7 +15,9 @@ const storage = new CloudinaryStorage({
     resource_type: 'raw',
     format: 'pdf',
     // allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'],
-    public_id: (req, file) => file.originalname.split('.')[0],
+    public_id: (req, file) => {
+      return `${Date.now()}-${file.originalname.split('.')[0]}`;
+    }
   },
 });
 
