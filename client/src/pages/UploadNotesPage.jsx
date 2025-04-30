@@ -59,13 +59,19 @@ const UploadNotesPage = () => {
     }
 
     const data = new FormData();
+    if (formData.file.size > 10 * 1024 * 1024) {
+      alert("File Size Should not be more than 10MB");
+      setLoading(false)
+      return; // Stop further execution if the file is too large
+    }
+    
     data.append('year', formData.year);
     data.append('branch', formData.branch);
     data.append('subject', formData.subject);
-    data.append('file', formData.file);
-    data.append('email',currentUser.emailtoSend)
-    console.log(localStorage.getItem('token'))
-
+    data.append('email', currentUser.emailtoSend);
+    data.append('file', formData.file); // Only append the file if it's valid
+    
+    console.log(localStorage.getItem('token'));
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/upload-notes`, {
         method: 'POST',
