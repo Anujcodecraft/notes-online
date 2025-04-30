@@ -51,17 +51,19 @@ const UploadNotesPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+    
     if (!formData.file || formData.file.type !== 'application/pdf') {
       setError('Please upload a PDF file');
       setLoading(false);
       return;
     }
-
+    
     const data = new FormData();
     if (formData.file.size > 10 * 1024 * 1024) {
       alert("File Size Should not be more than 10MB");
       setLoading(false)
+      // setFormData({...formData, file:null})
+      setError("File Size Should Not be more than 10MB")
       return; // Stop further execution if the file is too large
     }
     
