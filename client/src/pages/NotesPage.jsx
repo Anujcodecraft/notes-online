@@ -142,7 +142,7 @@ const NotesPage = () => {
   }, [filters, isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated && page > 0) {
+    if (isAuthenticated && page >= 0) {
       fetchNotes(page);
     }
   }, [page]);
