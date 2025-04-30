@@ -6,6 +6,8 @@ const PyqsPage = () => {
   const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [filters, setFilters] = useState({
     year: '',
     branch: '',
@@ -131,15 +133,27 @@ const PyqsPage = () => {
     }
   }, [filters.year, filters.branch]);
 
-  useEffect(() => {
-    fetchPyqs();
-  }, [filters]);
+ useEffect(() => {
+    // Reset page to 0 when filters change
+    setPage(0);
+    // Only fetch notes if the user is authenticated
+    if (isAuthenticated) {
+      fetchPyqs(0); // Always fetch first page when filters change
+    } else {
+      setLoading(false);
+    }
+  }, [filters, isAuthenticated]);
 
+    useEffect(() => {
+      if (isAuthenticated && page >= 0) {
+        fetchPyqs(page);
+      }
+    }, [page]);
   const handleViewPDF = (fileUrl) => {
     window.open(fileUrl, '_blank', 'noopener,noreferrer');
   };
 
-  const fetchPyqs = async () => {
+  const fetchPyqs = async (page) => {
     setLoading(true);
     try {
       const queryParams = new URLSearchParams();
@@ -147,6 +161,7 @@ const PyqsPage = () => {
       if (filters.branch) queryParams.append('branch', filters.branch);
       if (filters.subject) queryParams.append('subject', filters.subject);
       if (filters.title) queryParams.append('title', filters.title);
+      if(page) queryParams.append('page', page);
 
       const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/pyqs?${queryParams.toString()}`);
       if (!response.ok) throw new Error('Failed to fetch PYQs');
@@ -160,6 +175,9 @@ const PyqsPage = () => {
       }));
 
       setPyqs(processedData);
+      if(data.length===0){
+        setHasMore(false)
+      }
     } catch (err) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -177,6 +195,17 @@ const PyqsPage = () => {
       ...(name === 'branch' ? { subject: "" } : {})
     }));
   };
+
+  const handleNextPage = () => {
+    console.log("handle next page")
+    setPage(prevPage => prevPage + 1);
+  };
+
+  const handlePrevPage = () => {
+    setPage(prevPage => Math.max(0, prevPage - 1));
+    setHasMore(true);
+  };
+
 
   const handleUpvote = async (id) => {
     try {
@@ -226,7 +255,7 @@ const PyqsPage = () => {
                 Access exam papers from previous years to help you prepare better
               </p>
             </div>
-
+  
             {/* Filters */}
             <div className="bg-white p-6 rounded-xl shadow-lg mb-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
@@ -251,7 +280,7 @@ const PyqsPage = () => {
                     ))}
                   </select>
                 </div>
-
+  
                 {/* Branch Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="branch">
@@ -271,7 +300,7 @@ const PyqsPage = () => {
                     ))}
                   </select>
                 </div>
-
+  
                 {/* Subject Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="subject">
@@ -291,7 +320,7 @@ const PyqsPage = () => {
                     ))}
                   </select>
                 </div>
-
+  
                 {/* Exam Type Filter */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">
@@ -312,79 +341,121 @@ const PyqsPage = () => {
                 </div>
               </div>
             </div>
-
+  
             {/* Error or Loading */}
             {error && (
               <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded">
                 <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
-
+  
             {loading ? (
               <div className="flex justify-center py-20">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
               </div>
             ) : pyqs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {pyqs.map((pyq) => (
-                  <div key={pyq._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-                    <div className="p-6">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">{pyq.subject}</h3>
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2 ${
-                            pyq.title === 'Mini' ? 'bg-blue-100 text-blue-800' :
-                            pyq.title === 'Mid' ? 'bg-purple-100 text-purple-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {pyq.title} Semester
-                          </span>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pyqs.map((pyq) => (
+                    <div key={pyq._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+                      <div className="p-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900">{pyq.subject}</h3>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2 ${
+                              pyq.title === 'Mini' ? 'bg-blue-100 text-blue-800' :
+                              pyq.title === 'Mid' ? 'bg-purple-100 text-purple-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {pyq.title} Semester
+                            </span>
+                          </div>
+                          <div>
+                            <button
+                              onClick={() => handleUpvote(pyq._id)}
+                              className="flex items-center space-x-1 text-gray-500 hover:text-green-600 transition-colors"
+                              title="Upvote this PYQ"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                              </svg>
+                              <span>{pyq.upvotes.length}</span>
+                            </button>
+                          </div>
                         </div>
-                        <div>
+  
+                        <div className="mt-4 space-y-2 text-gray-600">
+                          <div>Year: {pyq.year}</div>
+                          <div>Branch: {pyq.branch}</div>
+                          <div>Uploaded by: {pyq.uploadedBy.name}</div>
+                        </div>
+  
+                        <div className="mt-6">
                           <button
-                            onClick={() => handleUpvote(pyq._id)}
-                            className="flex items-center space-x-1 text-gray-500 hover:text-green-600 transition-colors"
-                            title="Upvote this PYQ"
+                            onClick={() => handleViewPDF(pyq.fileurl)}
+                            className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                            </svg>
-                            <span>{pyq.upvotes.length}</span>
+                            View PDF
                           </button>
                         </div>
                       </div>
-
-                      <div className="mt-4 space-y-2 text-gray-600">
-                        <div>Year: {pyq.year}</div>
-                        <div>Branch: {pyq.branch}</div>
-                        <div>Uploaded by: {pyq.uploadedBy.name}</div>
-                      </div>
-
-                      <div className="mt-6">
-                        <button
-                          onClick={() => handleViewPDF(pyq.fileurl)}
-                          className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                          View PDF
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-                <h3 className="text-lg font-medium text-gray-900">No PYQs found</h3>
-                <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
-                <div className="mt-6">
+                  ))}
+                </div>
+  
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center mt-8">
                   <button
-                    onClick={() => setFilters({ year: '', branch: '', subject: '', title: '' })}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    onClick={handlePrevPage}
+                    disabled={page === 0}
+                    className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
                   >
-                    Clear all filters
+                    Previous
+                  </button>
+                  <span className="text-gray-700">Page {page + 1}</span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={!hasMore}
+                    className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                  >
+                    Next
                   </button>
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center py-16 bg-white rounded-xl shadow-sm">
+                  <h3 className="text-lg font-medium text-gray-900">No PYQs found</h3>
+                  <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+                  <div className="mt-6">
+                    <button
+                      onClick={() => setFilters({ year: '', branch: '', subject: '', title: '' })}
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      Clear all filters
+                    </button>
+                  </div>
+                </div>
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center mt-8">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={page === 0}
+                    className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-700">Page {page + 1}</span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={!hasMore}
+                    className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </>
+
             )}
           </div>
         </div>

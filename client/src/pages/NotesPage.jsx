@@ -177,7 +177,6 @@ const NotesPage = () => {
     setPage(prevPage => Math.max(0, prevPage - 1));
     setHasMore(true);
   };
-  console.log("page is ", page);
 
   const renderNotesContent = () => {
     if (loading) {

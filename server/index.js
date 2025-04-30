@@ -14,6 +14,7 @@ app.use(cookieParser());
 app.use(express.json()); // Parses JSON payloads
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.static('public')); // Serves files from 'public' folder
+app.use(express.urlencoded({ extended: true })); // ✅ Parses form-urlencoded
 
 app.get('/',(req, res)=>{
     res.send("<h1>hello jaitin</h1>")

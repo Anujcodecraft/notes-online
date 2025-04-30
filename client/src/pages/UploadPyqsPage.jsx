@@ -14,13 +14,14 @@ const UploadPyqsPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, currentUser } = useAuth();
+  
 
   // Options for dropdowns
   const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
   const branches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
-  const subjects = ['Data Structures', 'Algorithms', 'Database', 'Networks', 'OS', 'TOC', 'AI', 'ML'];
-  const titles = ['Mini', 'Mid', 'End'];
+  const subjects = ['Data Structures', 'Algorithms', 'Database', 'Networks', 'OS', 'TOC', 'AI', 'ML', 'Combined'];
+  const titles = ['Mini', 'Mid', 'End', 'Combined'];
 
   // Redirect if not authenticated
   if (!isAuthenticated) {
@@ -43,7 +44,6 @@ const UploadPyqsPage = () => {
     });
   };
 
-  const {currentUser} = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,6 +57,14 @@ const UploadPyqsPage = () => {
     }
 
     const data = new FormData();
+    if (formData.file.size > 10 * 1024 * 1024) {
+      alert("File Size Should not be more than 10MB");
+      setLoading(false)
+      // setFormData({...formData, file:null})
+      setError("File Size Should Not be more than 10MB")
+      return; // Stop further execution if the file is too large
+    }
+
     data.append('year', formData.year);
     data.append('branch', formData.branch);
     data.append('subject', formData.subject);

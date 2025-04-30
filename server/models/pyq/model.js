@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const pyqSchema = new mongoose.Schema({
   title: {
     type: String,
-    enum: ['Mini', 'Mid', 'End'],
+    enum: ['Mini', 'Mid', 'End', 'Combined'],
     required: true,
   },
   subject: {

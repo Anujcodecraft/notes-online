@@ -164,7 +164,7 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
   });
   
 
-  const allowedTitles = ['Mini', 'Mid', 'End'];
+  const allowedTitles = ['Mini', 'Mid', 'End', 'Combined'];
   const allowedBranches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
   // Add more allowed values for year and subject as needed
   
@@ -226,7 +226,7 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
           // Remove this line: upvotes: 0,
           createdAt: new Date()
         });
-        console.log("the user uploader is",pyq.uploader);
+        console.log("the user uploader is",pyq);
         
         // Update User Model
         await userModel.findByIdAndUpdate(
@@ -284,8 +284,9 @@ Router.get('/pyqs',  async (req, res) => {
     if (year) filter.year = year;
     if (branch) filter.branch = branch;
     if (subject) filter.subject = subject;
+    const page = parseInt(req.query.page) || 0;
     
-    const pyqs = await pyqModel.find(filter)
+    const pyqs = await pyqModel.find(filter).skip(page*6).limit(6)
     .populate('user', 'name') // Populate the uploader field with just the name
     .exec();
   
