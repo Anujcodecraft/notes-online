@@ -1,21 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
-
-const NotesPage = () => {
-  const [notes, setNotes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [filters, setFilters] = useState({
-    year: "",
-    branch: "",
-    subject: ""
-  });
-  const { isAuthenticated, currentUser } = useAuth();
 
   // Define branches based on year
-  const getBranchesForYear = (year) => {
+  export const getBranchesForYear = (year) => {
     if (year === "First Year") {
       return ["Common"];
     }
@@ -23,7 +8,7 @@ const NotesPage = () => {
   };
 
   // Define subjects based on year and branch
-  const getSubjectsForYearAndBranch = (year, branch) => {
+  export const getSubjectsForYearAndBranch = (year, branch) => {
     if (year === "First Year") {
       return ["1st Semester", "2nd Semester"];
     }
@@ -95,40 +80,28 @@ const NotesPage = () => {
     return ["All Subjects"];
   };
 
+const NotesPage = () => {
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [filters, setFilters] = useState({
+    year: "",
+    branch: "",
+    subject: ""
+  });
+  const { isAuthenticated, currentUser } = useAuth();
+
+
+
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   const [availableBranches, setAvailableBranches] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
 
-  // Update available branches when year changes
-  useEffect(() => {
-    if (filters.year) {
-      const branches = getBranchesForYear(filters.year);
-      setAvailableBranches(branches);
-      
-      // Reset branch filter if the current selection isn't valid for the new year
-      if (filters.branch && !branches.includes(filters.branch)) {
-        setFilters(prev => ({ ...prev, branch: "", subject: "" }));
-      }
-    } else {
-      setAvailableBranches([]);
-      setAvailableSubjects([]);
-    }
-  }, [filters.year]);
 
-  // Update available subjects when year or branch changes
-  useEffect(() => {
-    if (filters.year && filters.branch) {
-      const subjects = getSubjectsForYearAndBranch(filters.year, filters.branch);
-      setAvailableSubjects(subjects);
-      
-      // Reset subject filter if the current selection isn't valid for the new branch/year
-      if (filters.subject && !subjects.includes(filters.subject)) {
-        setFilters(prev => ({ ...prev, subject: "" }));
-      }
-    } else {
-      setAvailableSubjects([]);
-    }
-  }, [filters.year, filters.branch]);
+
+
 
   useEffect(() => {
     // Reset page to 0 when filters change
@@ -162,10 +135,10 @@ const NotesPage = () => {
       queryParams.append("page", pageNum);
 
       const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/notes?${queryParams.toString()}`, {
+      const res = await fetch(${import.meta.env.VITE_BASE_URL_BACKEND}/notes?${queryParams.toString()}, {
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token} `: ""
+          "Authorization": token ? Bearer ${token} : ""
         },
       });
 
@@ -198,16 +171,7 @@ const NotesPage = () => {
     }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value,
-      // Reset dependent filters when parent filter changes
-      ...(name === 'year' ? { branch: "", subject: "" } : {}),
-      ...(name === 'branch' ? { subject: "" } : {})
-    }));
-  };
+
 
   const handleUpvote = async (noteId) => {
     try {
@@ -249,12 +213,12 @@ const NotesPage = () => {
       );
 
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL_BACKEND}/notes/${noteId}/upvote`,
+        ${import.meta.env.VITE_BASE_URL_BACKEND}/notes/${noteId}/upvote,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            "Authorization": Bearer ${token},
           },
           body: JSON.stringify({ email: currentUser.emailtoSend }),
         }
@@ -369,7 +333,7 @@ const NotesPage = () => {
             <button
               onClick={handlePrevPage}
               disabled={page === 0}
-              className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}}
             >
               Previous
             </button>
@@ -377,7 +341,7 @@ const NotesPage = () => {
             <button
               onClick={handleNextPage}
               disabled={!hasMore}
-              className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}}
             >
               Next
             </button>
@@ -411,7 +375,7 @@ const NotesPage = () => {
           <button
             onClick={handlePrevPage}
             disabled={page === 0}
-            className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className={px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}}
           >
             Previous
           </button>
@@ -419,7 +383,7 @@ const NotesPage = () => {
           <button
             onClick={handleNextPage}
             disabled={!hasMore}
-            className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className={px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}}
           >
             Next
           </button>
