@@ -2,6 +2,7 @@ import { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import React from 'react';
+import { getBranchesForYear, getSubjectsForYearAndBranch } from '../services/subjects';
 
 const UploadNotesPage = () => {
   const [formData, setFormData] = useState({
@@ -18,8 +19,39 @@ const UploadNotesPage = () => {
 
   // Options for dropdowns
   const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
-  const branches = ['CSE', 'IT', 'ECE', 'EEE', 'ME', 'CE', 'CHE'];
-  const subjects = ['Data Structures', 'Algorithms', 'Database', 'Networks', 'OS', 'TOC', 'AI', 'ML'];
+  const [availableBranches, setAvailableBranches] = useState([]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  
+    // Update available branches when year changes
+    useEffect(() => {
+      if (formData.year) {
+        const branches = getBranchesForYear(formData.year);
+        setAvailableBranches(branches);
+        
+        // Reset branch filter if the current selection isn't valid for the new year
+        if (formData.branch && !branches.includes(formData.branch)) {
+          setFormData(prev => ({ ...prev, branch: "", subject: "" }));
+        }
+      } else {
+        setAvailableBranches([]);
+        setAvailableSubjects([]);
+      }
+    }, [formData.year]);
+  
+    // Update available subjects when year or branch changes
+    useEffect(() => {
+      if (formData.year && formData.branch) {
+        const subjects = getSubjectsForYearAndBranch(formData.year, formData.branch);
+        setAvailableSubjects(subjects);
+        
+        // Reset subject filter if the current selection isn't valid for the new branch/year
+        if (formData.subject && !subjects.includes(formData.subject)) {
+          setFormData(prev => ({ ...prev, subject: "" }));
+        }
+      } else {
+        setAvailableSubjects([]);
+      }
+    }, [formData.year, formData.branch]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -144,7 +176,7 @@ const UploadNotesPage = () => {
                 required
               >
                 <option value="">Select Branch</option>
-                {branches.map(branch => (
+                {availableBranches.map(branch => (
                   <option key={branch} value={branch}>{branch}</option>
                 ))}
               </select>
@@ -163,7 +195,7 @@ const UploadNotesPage = () => {
                 required
               >
                 <option value="">Select Subject</option>
-                {subjects.map(subject => (
+                {availableSubjects.map(subject => (
                   <option key={subject} value={subject}>{subject}</option>
                 ))}
               </select>
