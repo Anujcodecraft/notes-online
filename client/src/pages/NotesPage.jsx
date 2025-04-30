@@ -13,7 +13,7 @@ const NotesPage = () => {
     subject: ""
   });
   const { isAuthenticated, currentUser } = useAuth();
-  console.log("page value is ", page, hasMore)
+  // console.log("page value is ", page, hasMore)
 
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   const branches = ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE"];
@@ -41,7 +41,7 @@ const NotesPage = () => {
   }, [filters, isAuthenticated]);
 
   useEffect(() => {
-    if (isAuthenticated && page > 0) {
+    if (isAuthenticated && page >= 0) {
       fetchNotes(page);
     }
   }, [page]);
@@ -177,6 +177,7 @@ const NotesPage = () => {
     setPage(prevPage => Math.max(0, prevPage - 1));
     setHasMore(true);
   };
+  console.log("page is ", page);
 
   const renderNotesContent = () => {
     if (loading) {
