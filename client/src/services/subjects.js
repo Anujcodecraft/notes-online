@@ -4,7 +4,7 @@
     if (year === "First Year") {
       return ["Common"];
     }
-    return ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE"];
+    return ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE","MME"];
   };
 
   // Define subjects based on year and branch
@@ -42,6 +42,18 @@
             "Generation of Electric Power", "Electrical Machine 2",
             "Instrumentation", "Electronics 2"
           ];
+          case "CE":
+          return [
+            "Geotechnical Engg 1" , "Engineering Hydrology" , "Fluid Mechanics 2" , "Structure Analysis 2","Structural Design & Drawing 1","Surveying 2","Surveying Lab 2"
+          ]
+          case "CHE":
+            return [
+              "Heat Transfer 2","Mass Transfer 2", "Chemical Reaction Engineering 2","Chemical Reaction Engg-1","Mechical Operation","Heat-Transfer-1","Chemical Process Techbology-2","Mass Transfer-1","Instrumentation and Process Dynamics Control"
+            ]
+            case "MME":
+            return [
+              "Electronic and magnetic properties of material","chemical characterisation of materials ","Matlergical Kinetics","Material Testing","Fuel Furnance and Refactory","Polymeric Material"
+            ]
         default:
           return ["Common Subjects"];
       }
@@ -72,6 +84,18 @@
             "Linear Control System", "Electrical Drives", "Microprocessor",
             "Departmental Elective 3rd", "Departmental Elective 4th", "Open Elective 2"
           ];
+          case "CE":
+            return [
+              "Irrigation Engineering" , "Project Costing and Contract Management","Water Supply Engineering"
+            ]
+            case "CHE":
+              return [
+                "Process Modeling and Simulation","Transport Phenomena","Process Equipments Design Drawing-1","Department elective-3","Department elective-4","Open elective-2"
+              ]
+              case MME:
+                return[
+                  "Metal forming","Heat Treatement","Steel Making","Humanities"
+                ]
         default:
           return ["Common Subjects"];
       }
