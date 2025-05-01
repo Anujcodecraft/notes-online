@@ -1,0 +1,32 @@
+name: Code Health Check
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Run server test
+        working-directory: server
+        run: |
+          npm install
+          node index.js
+
+      - name: Run client build
+        working-directory: client
+        run: |
+          npm install
+          npm run build || exit 1
