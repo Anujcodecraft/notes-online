@@ -14,13 +14,4 @@ export const connectDB = async () => {
     console.error('❌ MongoDB connection error:', error.message);
     process.exit(1);
   }
-
-  // Optional listeners
-  mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️ MongoDB disconnected');
-  });
-
-  mongoose.connection.on('error', (err) => {
-    console.error('❌ MongoDB error:', err);
-  });
-};
+}
