@@ -17,18 +17,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20.18.3
+          node-version: 20
 
-      - name: Run server tests
+      - name: Run server test
         working-directory: server
         run: |
-          cd server
           npm install
-          node index.js & sleep 10
+          node index.js
 
-      - name: Run client build (sanity check)
+      - name: Run client build
         working-directory: client
         run: |
-          cd client
           npm install
           npm run build || exit 1
