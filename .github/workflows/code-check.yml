@@ -10,6 +10,31 @@ jobs:
   check-code:
     runs-on: ubuntu-latest
 
+    env:
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      MONGOURL: ${{ secrets.MONGOURL }}
+      PORT: ${{ secrets.PORT }}
+      SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      PRIVATE_KEY_ID: ${{ secrets.PRIVATE_KEY_ID }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      AUTH_URI: ${{ secrets.AUTH_URI }}
+      TOKEN_URI: ${{ secrets.TOKEN_URI }}
+      AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.AUTH_PROVIDER_X509_CERT_URL }}
+      CLIENT_X509_CERT_URL: ${{ secrets.CLIENT_X509_CERT_URL }}
+      UNIVERSE_DOMAIN: ${{ secrets.UNIVERSE_DOMAIN }}
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_BASE_URL_BACKEND: ${{ secrets.VITE_BASE_URL_BACKEND }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,7 +42,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20.18.3
 
       - name: Run server test
         working-directory: server

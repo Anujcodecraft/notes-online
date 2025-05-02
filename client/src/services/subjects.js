@@ -4,7 +4,7 @@
     if (year === "First Year") {
       return ["Common"];
     }
-    return ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE","MME"];
+    return ["CSE", "IT", "ECE", "EEE", "ME", "CE", "CHE","MME","MDS"];
   };
 
   // Define subjects based on year and branch
@@ -53,6 +53,10 @@
             case "MME":
             return [
               "Electronic and magnetic properties of material","chemical characterisation of materials ","Matlergical Kinetics","Material Testing","Fuel Furnance and Refactory","Polymeric Material"
+            ]
+            case "MDS"
+            return [
+              
             ]
         default:
           return ["Common Subjects"];
