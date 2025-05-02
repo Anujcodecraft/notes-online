@@ -54,9 +54,9 @@
             return [
               "Electronic and magnetic properties of material","chemical characterisation of materials ","Matlergical Kinetics","Material Testing","Fuel Furnance and Refactory","Polymeric Material"
             ]
-            case "MDS"
+            case "MDS":
             return [
-              
+              "DSA"
             ]
         default:
           return ["Common Subjects"];
