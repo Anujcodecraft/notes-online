@@ -17,6 +17,9 @@ export default function UserPagePreview() {
 
   useEffect(() => {
     const fetchUserStats = async () => {
+      if(!currentUser){
+        return;
+      }
       try {
         // Fetch notes count
         const notesRes = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-notes?email=${currentUser.emailtoSend}`);

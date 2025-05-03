@@ -43,7 +43,7 @@ Router.post('/signup', async (req, res) => {
     return res.status(CREATED).json({
       message: "User Registered Successfully",
       token,
-      user: { nametoSend, emailtoSend, verified }
+      user: { nametoSend, emailtoSend, verified, role:user.role }
     });
 
   } catch (error) {
@@ -56,18 +56,23 @@ Router.post('/signup', async (req, res) => {
 Router.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(NO_CONTENT).json({ message: "Please provide all fields" });
+      }
       const userone = await userModel.findOne({ email });
       console.log(userone)
       if (!userone) return res.status(404).json({ message: 'User not found' });
-  
-      const isMatch =  bcrypt.compare(password, userone.password);
+      
+      if(userone.provider!=='local') return res.status(404).json({ message: 'Please Try sign in using google' });
+
+      const isMatch =  await bcrypt.compare(password, userone.password);
       if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
   
       const token = generateToken(userone)
     const { name:nametoSend, email:emailtoSend, verified } = userone; // or newly created user
 
       res.cookie('token', token, {  maxAge: 7 * 24 * 60 * 60 * 1000 });
-      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified } });
+      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role } });
     } catch (err) {
       res.status(500).json({ error: 'Login failed', details: err.message });
     }
@@ -92,7 +97,7 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
           }
       }
       const token = generateToken({_id:user._id, email:email});
-      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true}, token });
+      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role}, token });
   } catch (error) {
       return res.status(500).json({
           message: error.message,
@@ -109,9 +114,9 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
     // Find the user by email
     const UUser = await userModel.findOne({ email });
 
-    // if ( UUser.role !== 'uploader') {
-    //   return res.status(403).json({ error: 'Approval required for uploading' });
-    // }
+    if ( UUser.role !== 'uploader') {
+      return res.status(403).json({ error: 'Approval required for uploading' });
+    }
 
     if (!UUser) {
       return res.status(404).json({ error: 'User not found' });
@@ -208,9 +213,9 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
         // Find user by email from authenticated request
         const UUser = await userModel.findOne({ email });
         
-      // if ( UUser.role !== 'uploader') {
-      //   return res.status(403).json({ error: 'Approval required for uploading' });
-      // }
+      if ( UUser.role !== 'uploader') {
+        return res.status(403).json({ error: 'Approval required for uploading' });
+      }
         if (!UUser) {
             return res.status(404).json({ message: "User not found" });
         }
