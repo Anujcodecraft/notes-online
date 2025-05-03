@@ -52,7 +52,7 @@
             ]
             case "MME":
             return [
-              "Electronic and magnetic properties of material","chemical characterisation of materials ","Matlergical Kinetics","Material Testing","Fuel Furnance and Refactory","Polymeric Material"
+              "Math-4", "FOD", "Iron and Steel Making", "Mechanical Behaviour of Materials", "Casting and Solidification", "Transport Phenomenon" 
             ]
             case "MDS":
             return [
