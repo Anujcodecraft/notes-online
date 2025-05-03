@@ -17,7 +17,10 @@ const UploadPyqsPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, currentUser } = useAuth();
   
-
+  if(currentUser.role!=='uploader'){
+    // alert("You are not allowed to upload things")
+    navigate('/');
+  }
   // Options for dropdowns
   const years = ['First Year', 'Second Year', 'Third Year', 'Fourth Year'];
   const [availableBranches, setAvailableBranches] = useState([]);
