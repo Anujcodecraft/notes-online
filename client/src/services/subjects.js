@@ -85,7 +85,7 @@
           ];
         case "EEE":
           return [
-            "Linear Control System", "Electrical Drives", "Microprocessor",
+            "Linear Control System", "Electrical Drives", "Microprocessor","EHV AC DC", "Microprocessor and Microcontroller", "Power Quality","Power system fault analysis and protection","modern Control System","Engineering Management",  
             "Departmental Elective 3rd", "Departmental Elective 4th", "Open Elective 2"
           ];
           case "CE":
