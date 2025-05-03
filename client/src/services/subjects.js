@@ -94,9 +94,9 @@
             ]
             case "CHE":
               return [
-                "Process Modeling and Simulation","Transport Phenomena","Process Equipments Design Drawing-1","Department elective-3","Department elective-4","Open elective-2"
+                "Process Modeling and Simulation","Transport Phenomena","Process Equipments Design Drawing-1","Department elective-3","Plant Design and Economics", "Process Piping", "DSA", "CPED"
               ]
-              case MME:
+              case "MME":
                 return[
                   "Metal forming","Heat Treatement","Steel Making","Humanities"
                 ]

@@ -10,18 +10,24 @@ import UploadNotesPage from './pages/UploadNotesPage';
 import UploadPyqsPage from './pages/UploadPyqsPage';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
-import Anuj from './pages/Anuj';
 import Profile from './pages/Profile';
 import MyNotes from './pages/MyNotes';
 import MyPyqs from './pages/MyPyqs';
 import About from './pages/About'
 import ContactUs from './pages/ContactUs'
+import ReactGA from "react-ga4";
+import usePageTracking from './hooks/usePageTracking';
+
+ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
 function App() {
+
+
   const [count, setCount] = useState(0)
 
   return (
     <AuthProvider>
       <Router>
+        <GAListener />
         <div className="min-h-screen bg-gray-50">
           <Navbar />
           <Routes>
@@ -47,3 +53,8 @@ function App() {
 }
 
 export default App
+
+function GAListener() {
+  usePageTracking();
+  return null;
+}
