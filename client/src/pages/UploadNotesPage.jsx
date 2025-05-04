@@ -95,8 +95,8 @@ const UploadNotesPage = () => {
     }
     
     const data = new FormData();
-    if (formData.file.size > 10 * 1024 * 1024) {
-      alert("File Size Should not be more than 10MB");
+    if (formData.file.size > 25 * 1024 * 1024) {
+      alert("File Size Should not be more than 25MB");
       setLoading(false)
       // setFormData({...formData, file:null})
       setError("File Size Should Not be more than 10MB")

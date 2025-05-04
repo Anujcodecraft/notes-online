@@ -6,16 +6,67 @@ import { mainmiddleware } from '../Middleware/index.js';
 import { generateToken } from '../services/auth.js';
 import { notesModel } from '../models/notes/model.js';
 import multer from 'multer';
-import { storage } from '../cloudinary/index.js';
+import { cloudinary, storage } from '../cloudinary/index.js';
 import verifyGoogleToken from '../Middleware/googleAuth.js'
 import bcrypt from "bcrypt"
 export const Router = express.Router();
 import nodemailer from 'nodemailer'
 import jwt from 'jsonwebtoken'
+import { PassThrough } from 'stream';
+import { supabase } from '../config/supabase/index.js';
 
-const upload = multer({ storage });
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 24 * 1024 * 1024 }, // 20MB
+});
 
 
+export async function uploader(req) {
+  const file = req.file;
+  const maxCloudinarySize = 10 * 1024 * 1024; // 10MB
+
+  if (!file) throw new Error("No file uploaded");
+
+  if (file.size <= maxCloudinarySize) {
+    // Upload to Cloudinary
+    return await new Promise((resolve, reject) => {
+      const stream = new PassThrough();
+      stream.end(file.buffer);
+
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'raw',
+          folder: 'uploadsNotes',
+          public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+          format: 'pdf',
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve({ url: result.secure_url, storage: 'cloudinary' });
+        }
+      );
+
+      stream.pipe(uploadStream);
+    });
+  } else {
+    // Upload to Supabase
+    console.log("yha tak thik hain")
+    const fileName = `${Date.now()}-${file.originalname}`;
+    const { error } = await supabase.storage
+    .from('notesonline')
+    .upload(`uploads/${fileName}`, file.buffer, {
+      contentType: file.mimetype,
+    });
+    
+    if (error) throw error;
+    
+    const url = supabase.storage
+    .from('notesonline')
+    .getPublicUrl(`uploads/${fileName}`).data.publicUrl;
+    return { url, storage: 'supabase' };
+  }
+}
 
 
 Router.post('/signup', async (req, res) => {
@@ -122,16 +173,18 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
       return res.status(404).json({ error: 'User not found' });
     }
 
+    // function to add notes in either supabase or cloudinary
+    const {url, storage}= await uploader(req);
+
     // Create note
     const note = await notesModel.create({
       year,
       branch,
       subject,
       user: UUser._id,
-      fileurl: req.file.path,
+      fileurl: url,
     });
-    console.log("the uploader id is as follows",note.user)
-
+    console.log("the uploader id is as follows",note.user, url)
     // Add note ID to user's notes array
     await userModel.findByIdAndUpdate(UUser._id, {
       $push: { notes: note._id },
@@ -142,6 +195,16 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
     console.error(err);
     res.status(400).json({ error: 'Note upload failed', details: err.message });
   }
+});
+
+Router.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).send('File size exceeds the 25MB limit');
+    }
+  }
+  // If it's a different kind of error, pass it to the next handler
+  next(err);
 });
   
   Router.get('/notes', mainmiddleware, async (req, res) => {
@@ -220,6 +283,10 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
             return res.status(404).json({ message: "User not found" });
         }
 
+            // function to add notes in either supabase or cloudinary
+      const {url, storage}= await uploader(req);
+
+
         // Create PYQ entry
         const pyq = await pyqModel.create({
           title,
@@ -227,11 +294,11 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
           branch,
           subject: sanitizedSubject,
           user: UUser._id,
-          fileurl: req.file.path,
+          fileurl: url,
           // Remove this line: upvotes: 0,
           createdAt: new Date()
         });
-        console.log("the user uploader is",pyq);
+        console.log("the user uploader is",pyq, url);
         
         // Update User Model
         await userModel.findByIdAndUpdate(
