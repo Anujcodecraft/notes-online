@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { createContext, useState, useEffect, useContext } from 'react';
 import React from 'react';
 const AuthContext = createContext();
@@ -16,39 +17,53 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   }
+  async function fetchUserDetails(token){
+    try {
+      const {data} = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/userdetails`, {headers:{Authorization:`Bearer ${token}`}});
+      const user = data.data;
+      if (user && user !== "undefined") {
+        // user.date=Date.now()
+        const now = new Date();
+  
+        const formattedDate = now.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        }); // e.g., "25 April 2025"
+        
+        const formattedTime = now.toLocaleTimeString('en-GB'); // e.g., "14:45:08"
+        
+        const userWithDate = {
+          user,
+          date: formattedDate,
+          time: formattedTime,
+        };
+        
+        setCurrentUser(userWithDate);
+        
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
+    setLoading(false);
+    // return user.data.data;
+  }
   
 
   useEffect(() => {
     // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if(!token){
+      setLoading(false);
+      return;
+    }
+    fetchUserDetails(token);
     const storedUser = localStorage.getItem('user');
     if(!isJSON(storedUser)){
       localStorage.removeItem('user');
       setLoading(false);
       return;
     }
-    const user = localStorage.getItem('user');
-    if (user && user !== "undefined") {
-      // user.date=Date.now()
-      const now = new Date();
-
-      const formattedDate = now.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      }); // e.g., "25 April 2025"
-      
-      const formattedTime = now.toLocaleTimeString('en-GB'); // e.g., "14:45:08"
-      
-      const userWithDate = {
-        ...JSON.parse(user),
-        date: formattedDate,
-        time: formattedTime,
-      };
-      
-      setCurrentUser(userWithDate);
-      
-    }
-    setLoading(false);
   }, []);
 
   const login = (userData, token) => {
