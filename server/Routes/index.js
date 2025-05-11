@@ -1,7 +1,7 @@
 import express from 'express'
 import { userModel } from '../models/user/model.js';
 import pyqModel from '../models/pyq/model.js'
-import { CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT } from '../utils/statuscode.js';
+import { CONFLICT, CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK } from '../utils/statuscode.js';
 import { mainmiddleware } from '../Middleware/index.js';
 import { generateToken } from '../services/auth.js';
 import { notesModel } from '../models/notes/model.js';
@@ -11,7 +11,6 @@ import verifyGoogleToken from '../Middleware/googleAuth.js'
 import bcrypt from "bcrypt"
 export const Router = express.Router();
 import nodemailer from 'nodemailer'
-import jwt from 'jsonwebtoken'
 import { PassThrough } from 'stream';
 import { supabase } from '../config/supabase/index.js';
 
@@ -129,6 +128,20 @@ Router.post('/login', async (req, res) => {
     }
   });
 
+Router.get('/userdetails',mainmiddleware, async (req, res) =>{
+  try {
+    const {_id:id} = req.user;
+    const user = await userModel.findById(id);
+    if(!user){
+      return res.status(CONFLICT).json({message:"No user with the current id"});
+    }
+    return res.status(OK).json({message:"Successfully fetched user detail", data: { nametoSend:user.name, emailtoSend:user.email, verified:user.verified, role:user.role }});
+  } catch (error) {
+    return res.status(INTERNAL_SERVER_ERROR).json({
+      message: error.message,
+  });
+  }
+})
 Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
   try {
       // console.log(req.user)
