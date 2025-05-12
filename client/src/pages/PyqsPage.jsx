@@ -312,7 +312,7 @@ const PyqsPage = () => {
                         Uploaded by:{' '}
                         <Link
                           to={`/Profile/${pyq.uploadedBy._id}`}
-                          className="text-blue-600 hover:underline"
+                          className="font-semibold text-gray-600  hover:text-gray-900 transition-colors"
                         >
                           {pyq.uploadedBy.name}
                         </Link>
