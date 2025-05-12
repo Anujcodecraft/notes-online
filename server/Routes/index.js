@@ -633,7 +633,7 @@ Router.get("/Profile/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const user = await userModel.findById(userId).select('name email');
+    const user = await userModel.findById(userId).select('name');
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

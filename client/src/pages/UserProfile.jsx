@@ -73,28 +73,17 @@ const UserProfile = () => {
     return '';
   };
 
-  return (
+return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 pt-22">
       <div className="max-w-3xl mx-auto">
         {/* Profile Header */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
           <div className="p-6 sm:p-8">
-            <div className="flex items-center space-x-4 mb-6">
+            <div className="flex items-center space-x-4 mb-2">
               <div className="bg-blue-100 p-3 rounded-full">
                 <FiUser className="text-blue-600 text-2xl" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-800">Uploader Profile</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <FiUser className="text-gray-500 mr-2" />
-                <p className="text-gray-700"><span className="font-semibold">Name:</span> {data.user.name || 'Not available'}</p>
-              </div>
-              <div className="flex items-center">
-                <FiMail className="text-gray-500 mr-2" />
-                <p className="text-gray-700"><span className="font-semibold">Email:</span> {data.user.email || 'Not available'}</p>
-              </div>
+              <h2 className="text-2xl font-bold text-gray-800">{data.user.name || 'Uploader'}</h2>
             </div>
           </div>
         </div>
@@ -106,12 +95,19 @@ const UserProfile = () => {
               <div className="bg-green-100 p-3 rounded-full">
                 <FiBook className="text-green-600 text-xl" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-800">Notes Uploaded</h3>
-              <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                {data.notes?.length || 0}
-              </span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                <h3 className="text-xl font-semibold text-gray-800">Notes Uploaded</h3>
+                <div className="flex items-center space-x-2 mt-1 sm:mt-0">
+                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {data.notes?.length || 0} Files
+                  </span>
+                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {data.notes?.reduce((sum, note) => sum + (note.upvotesCount || 0), 0)} Upvotes
+                  </span>
+                </div>
+              </div>
             </div>
-            
+
             {data.notes && data.notes.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 {data.notes.map((note) => (
@@ -119,24 +115,21 @@ const UserProfile = () => {
                     <p className="font-medium text-gray-800 mb-2">
                       {getSubjectName(note)}
                     </p>
-                    
                     {note.year && (
                       <p className="text-sm text-gray-600 mb-1">
                         Year: <span className="font-medium">{note.year}</span>
                       </p>
                     )}
-                    
                     {getBranchName(note) && (
                       <p className="text-sm text-gray-600 mb-1">
                         Branch: <span className="font-medium">{getBranchName(note)}</span>
                       </p>
                     )}
-                    {note.upvotesCount && (
+                    {note.upvotesCount > 0 && (
                       <p className="text-sm text-gray-600 mb-1">
                         Upvotes: <span className="font-medium">{note.upvotesCount}</span>
                       </p>
                     )}
-                    
                     {note.fileurl && (
                       <button
                         onClick={() => window.open(note.fileurl, '_blank')}
@@ -164,12 +157,19 @@ const UserProfile = () => {
               <div className="bg-purple-100 p-3 rounded-full">
                 <FiFileText className="text-purple-600 text-xl" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-800">PYQs Uploaded</h3>
-              <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                {data.pyqs?.length || 0}
-              </span>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                <h3 className="text-xl font-semibold text-gray-800">PYQs Uploaded</h3>
+                <div className="flex items-center space-x-2 mt-1 sm:mt-0">
+                  <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {data.pyqs?.length || 0} Files
+                  </span>
+                  <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {data.pyqs?.reduce((sum, pyq) => sum + (pyq.upvotesCount || 0), 0)} Upvotes
+                  </span>
+                </div>
+              </div>
             </div>
-            
+
             {data.pyqs && data.pyqs.length > 0 ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 {data.pyqs.map((pyq) => (
@@ -177,26 +177,26 @@ const UserProfile = () => {
                     <p className="font-medium text-gray-800 mb-2">
                       {getSubjectName(pyq)}
                     </p>
-                    
                     {pyq.year && (
                       <p className="text-sm text-gray-600 mb-1">
                         Year: <span className="font-medium">{pyq.year}</span>
                       </p>
                     )}
-                    
                     {getBranchName(pyq) && (
                       <p className="text-sm text-gray-600 mb-1">
                         Branch: <span className="font-medium">{getBranchName(pyq)}</span>
                       </p>
                     )}
-                    
                     {pyq.title && (
                       <p className="text-sm text-gray-600 mb-1">
                         Type: <span className="font-medium">{pyq.title}</span>
                       </p>
                     )}
-                    
-                    
+                    {pyq.upvotesCount > 0 && (
+                      <p className="text-sm text-gray-600 mb-1">
+                        Upvotes: <span className="font-medium">{pyq.upvotesCount}</span>
+                      </p>
+                    )}
                     {pyq.fileurl && (
                       <button
                         onClick={() => window.open(pyq.fileurl, '_blank')}

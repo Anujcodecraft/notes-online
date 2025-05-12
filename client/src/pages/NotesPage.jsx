@@ -274,11 +274,11 @@ const NotesPage = () => {
                       <span>
                         Uploaded by:{' '}
                         <Link
-                          to={`/Profile/${note.uploadedBy._id}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {note.uploadedBy.name}
-                        </Link>
+                            to={`/Profile/${note.uploadedBy._id}`}
+                            className="font-semibold text-gray-600  hover:text-gray-900 transition-colors"
+                          >
+                            {note.uploadedBy.name}
+                      </Link>
                       </span>
 
 

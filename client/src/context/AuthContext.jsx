@@ -23,23 +23,23 @@ export const AuthProvider = ({ children }) => {
       const user = data.data;
       if (user && user !== "undefined") {
         // user.date=Date.now()
-        const now = new Date();
+        // const now = new Date();
   
-        const formattedDate = now.toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        }); // e.g., "25 April 2025"
+        // const formattedDate = now.toLocaleDateString('en-GB', {
+        //   day: '2-digit',
+        //   month: 'long',
+        //   year: 'numeric',
+        // }); // e.g., "25 April 2025"
         
-        const formattedTime = now.toLocaleTimeString('en-GB'); // e.g., "14:45:08"
+        // const formattedTime = now.toLocaleTimeString('en-GB'); // e.g., "14:45:08"
         
-        const userWithDate = {
-          user,
-          date: formattedDate,
-          time: formattedTime,
-        };
+        // const userWithDate = {
+        //   user,
+        //   date: formattedDate,
+        //   time: formattedTime,
+        // };
         
-        setCurrentUser(userWithDate);
+        setCurrentUser(user);
         
       }
     } catch (error) {
@@ -58,12 +58,6 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     fetchUserDetails(token);
-    const storedUser = localStorage.getItem('user');
-    if(!isJSON(storedUser)){
-      localStorage.removeItem('user');
-      setLoading(false);
-      return;
-    }
   }, []);
 
   const login = (userData, token) => {
