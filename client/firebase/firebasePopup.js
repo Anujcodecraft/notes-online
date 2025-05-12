@@ -4,7 +4,7 @@ import { app } from "./firebaseConfig";
 export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-export const authenticationPopup = async() => {
+export const authenticationPopup = async() => { 
     try {
         const result = await signInWithPopup(auth, provider);
         const credential = GoogleAuthProvider.credentialFromResult(result)

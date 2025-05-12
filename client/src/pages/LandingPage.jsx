@@ -4,7 +4,6 @@ import React from 'react';
 
 const LandingPage = () => {
   const { isAuthenticated, currentUser } = useAuth();
-  console.log("current user is ", currentUser)
 
   const handleWhatsAppClick = () => {
     const phoneNumber = '918462892088'; // Replace with your WhatsApp number

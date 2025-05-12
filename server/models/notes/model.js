@@ -9,6 +9,15 @@ const notesSchema = mongoose.Schema({
         type:"string",
         req:true
     },
+    uploader: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // reference to the User model
+    required: true,
+  },
+  branch: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Branch', // optional, only if you use branches
+  },
     branch:{
         type:"string",
         req:true

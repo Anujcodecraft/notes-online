@@ -157,7 +157,7 @@ const SignupPage = () => {
         
         if (data.token && data.user) {
           login(data.user, data.token);
-          navigate('/notes');
+          navigate('/');
         } else {
           navigate('/login');
         }

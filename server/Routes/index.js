@@ -424,7 +424,6 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
   Router.get('/my-notes', async (req, res) => {
     try {
       const { email } = req.query;
-      console.log("the email is that getting ",email)
   
       if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -448,20 +447,16 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
   Router.get('/my-pyqs', async (req, res) => {
     try {
       const { email } = req.query;
-      console.log("the email is that getting ",email)
   
       if (!email) {
         return res.status(400).json({ error: 'Email is required' });
       }
   
       // Find user and populate their uploaded notes
-      console.log("here at pos2 ")
       const user = await userModel.findOne({ email }).populate('pyqs');
-       console.log("the user is ",user)
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
-      console.log("now i am herer at current ")
       res.status(200).json(user.pyqs);
     } catch (err) {
       console.error(err);
@@ -632,3 +627,45 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
       console.log(error)
     }
   })
+
+
+Router.get("/Profile/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await userModel.findById(userId).select('name');
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch notes uploaded by this user
+    const notes = await notesModel.find({ user: userId })
+      .populate('branch', 'name')
+      .select('subjectName branch createdAt fileurl year subject upvotes');
+
+    // Fetch PYQs uploaded by this user
+    const pyqs = await pyqModel.find({ user: userId })
+      .populate('branch', 'name')
+      .select('subjectName branch createdAt fileurl year subject upvotes');
+
+    // Calculate upvotes count and remove upvotes field
+    const formattedNotes = notes.map(note => {
+      const { upvotes, ...rest } = note.toObject();
+      return { ...rest, upvotesCount: upvotes.length };
+    });
+
+    const formattedPyqs = pyqs.map(pyq => {
+      const { upvotes, ...rest } = pyq.toObject();
+      return { ...rest, upvotesCount: upvotes.length };
+    });
+
+    res.json({ 
+      user, 
+      notes: formattedNotes, 
+      pyqs: formattedPyqs 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
