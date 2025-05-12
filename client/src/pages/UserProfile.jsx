@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FiUser, FiMail, FiBook, FiFileText, FiLoader, FiAlertCircle } from 'react-icons/fi';
 
@@ -129,6 +129,11 @@ const UserProfile = () => {
                     {getBranchName(note) && (
                       <p className="text-sm text-gray-600 mb-1">
                         Branch: <span className="font-medium">{getBranchName(note)}</span>
+                      </p>
+                    )}
+                    {note.upvotesCount && (
+                      <p className="text-sm text-gray-600 mb-1">
+                        Upvotes: <span className="font-medium">{note.upvotesCount}</span>
                       </p>
                     )}
                     

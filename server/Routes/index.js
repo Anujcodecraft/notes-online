@@ -638,20 +638,31 @@ Router.get("/Profile/:userId", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Find notes uploaded by this user
-    const notes = await notesModel.find({ user: userId })  // Changed from 'uploader' to 'user'
+    // Fetch notes uploaded by this user
+    const notes = await notesModel.find({ user: userId })
       .populate('branch', 'name')
-      .select('subjectName branch createdAt');  // Add other fields you need
+      .select('subjectName branch createdAt fileurl year subject upvotes');
 
-    // Find PYQs uploaded by this user
-    const pyqs = await pyqModel.find({ user: userId })  // Changed from 'uploader' to 'user'
+    // Fetch PYQs uploaded by this user
+    const pyqs = await pyqModel.find({ user: userId })
       .populate('branch', 'name')
-      .select('subjectName branch createdAt');  // Add other fields you need
+      .select('subjectName branch createdAt fileurl year subject upvotes');
+
+    // Calculate upvotes count and remove upvotes field
+    const formattedNotes = notes.map(note => {
+      const { upvotes, ...rest } = note.toObject();
+      return { ...rest, upvotesCount: upvotes.length };
+    });
+
+    const formattedPyqs = pyqs.map(pyq => {
+      const { upvotes, ...rest } = pyq.toObject();
+      return { ...rest, upvotesCount: upvotes.length };
+    });
 
     res.json({ 
       user, 
-      notes, 
-      pyqs 
+      notes: formattedNotes, 
+      pyqs: formattedPyqs 
     });
   } catch (error) {
     console.error(error);
