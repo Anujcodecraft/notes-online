@@ -46,7 +46,7 @@ export default function Navbar() {
   return (
     <>
       {/* Navbar - Always on top */}
-      <header className="bg-blue-100 shadow-md fixed top-0 w-full z-50">
+      <header className="bg-slate-700 shadow-md fixed top-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-4">
@@ -55,7 +55,7 @@ export default function Navbar() {
                 alt="MANIT Logo" 
                 className="h-12 w-12 object-contain"
               />
-              <Link to="/" className="text-xl md:text-2xl font-bold text-blue-700">
+              <Link to="/" className="text-xl md:text-2xl font-bold text-gray-300">
                 ManitStudyPortal
               </Link>
             </div>

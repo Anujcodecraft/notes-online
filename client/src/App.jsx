@@ -28,7 +28,7 @@ function App() {
     <AuthProvider>
       <Router>
         <GAListener />
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 ">
           <Navbar />
           <Routes>
             <Route path="/" element={<LandingPage />} />

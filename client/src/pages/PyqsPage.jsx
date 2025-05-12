@@ -164,11 +164,11 @@ const PyqsPage = () => {
   return (
     <>
       {isAuthenticated ? (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="min-h-screen bg-slate-900 py-8 px-4 sm:px-6 lg:px-8 mt-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+              <h1 className="text-4xl font-extrabold text-gray-300 sm:text-5xl sm:tracking-tight lg:text-6xl">
                 Previous Year Questions
               </h1>
               <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
@@ -188,7 +188,7 @@ const PyqsPage = () => {
                     Academic Year
                   </label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md border"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md border"
                     id="year"
                     name="year"
                     value={filters.year}
@@ -207,7 +207,7 @@ const PyqsPage = () => {
                     Branch
                   </label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md border"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md border"
                     id="branch"
                     name="branch"
                     value={filters.branch}
@@ -227,7 +227,7 @@ const PyqsPage = () => {
                     Subject
                   </label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md border"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md border"
                     id="subject"
                     name="subject"
                     value={filters.subject}
@@ -247,7 +247,7 @@ const PyqsPage = () => {
                     Exam Type
                   </label>
                   <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md border"
+                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md border"
                     id="title"
                     name="title"
                     value={filters.title}
@@ -271,7 +271,7 @@ const PyqsPage = () => {
   
             {loading ? (
               <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-600"></div>
               </div>
             ) : pyqs.length > 0 ? (
               <>
@@ -293,7 +293,7 @@ const PyqsPage = () => {
                           <div>
                             <button
                               onClick={() => handleUpvote(pyq._id)}
-                              className="flex items-center space-x-1 text-gray-500 hover:text-green-600 transition-colors"
+                              className="flex items-center space-x-1 text-gray-500 hover:text-pink-600 transition-colors"
                               title="Upvote this PYQ"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -313,7 +313,7 @@ const PyqsPage = () => {
                         <div className="mt-6">
                           <button
                             onClick={() => handleViewPDF(pyq.fileurl)}
-                            className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-pink-700 to-pink-400 hover:to-rose-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
                           >
                             View PDF
                           </button>
@@ -328,15 +328,15 @@ const PyqsPage = () => {
                   <button
                     onClick={handlePrevPage}
                     disabled={page === 0}
-                    className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                    className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-pink-700 hover:bg-pink-800 text-white'}`}
                   >
                     Previous
                   </button>
-                  <span className="text-gray-700">Page {page + 1}</span>
+                  <span className="text-gray-300">Page {page + 1}</span>
                   <button
                     onClick={handleNextPage}
                     disabled={!hasMore}
-                    className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                    className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-pink-700 hover:bg-pink-800 text-white'}`}
                   >
                     Next
                   </button>
@@ -350,7 +350,7 @@ const PyqsPage = () => {
                   <div className="mt-6">
                     <button
                       onClick={() => setFilters({ year: '', branch: '', subject: '', title: '' })}
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
                     >
                       Clear all filters
                     </button>

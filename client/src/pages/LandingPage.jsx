@@ -19,10 +19,10 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-slate-900">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-28 text-center">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-200 to-slate-300  bg-clip-text text-transparent mb-4">
           Welcome to MANIT Study Portal
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -36,13 +36,14 @@ const LandingPage = () => {
               <div className="flex flex-wrap justify-center gap-4">
                 <Link 
                   to="/AllNotes" 
-                  className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:from-blue-600 hover:to-blue-700"
+                  className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-cyan-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all  
+                  hover:to-blue-600"
                 >
                   Browse Notes
                 </Link>
                 <Link 
                   to="/pyqs" 
-                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:from-green-600 hover:to-green-700"
+                  className="px-8 py-3 bg-gradient-to-r from-pink-700 to-pink-400 text-white rounded-lg shadow-md hover:shadow-lg transition-all  hover:to-rose-400"
                 >
                   Browse PYQs
                 </Link>
@@ -84,7 +85,7 @@ const LandingPage = () => {
         </div>
 
           {/* Notice Section */}
-          <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg max-w-2xl mx-auto w-full">
+          <div className=" mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg max-w-2xl mx-auto w-full">
             <div className="flex flex-col md:flex-row items-start md:items-center">
               <div className="flex-shrink-0 flex items-start">
                 <svg className="h-5 w-5 text-yellow-400 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -114,31 +115,32 @@ const LandingPage = () => {
       <div className="container mx-auto px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Feature Card 1 */}
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all border border-blue-100">
-            <div className="bg-gradient-to-r from-blue-100 to-blue-50 p-4 rounded-lg mb-4">
-              <h3 className="text-xl font-semibold text-blue-600">Access Notes</h3>
+          <div className="bg-slate-900 hover:bg-slate-800 p-8
+            rounded-3xl rounded-tl-xs shadow-lg hover:shadow-xl  transition-all border  border-blue-100">
+            <div className="bg-gradient-to-r from-blue-100 to-blue-50 p-4 rounded-bl-xl rounded-tr-xl mb-4">
+              <h3 className="text-xl font-semibold text-cyan-600">Access Notes</h3>
             </div>
-            <p className="text-gray-700">
+            <p className="text-cyan-100">
               Browse and download quality notes for various subjects and branches with our organized collection.
             </p>
           </div>
 
           {/* Feature Card 2 */}
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all border border-green-100">
-            <div className="bg-gradient-to-r from-green-100 to-green-50 p-4 rounded-lg mb-4">
+          <div className="bg-slate-700 hover:bg-slate-600 p-8 rounded-3xl rounded-tl-xs shadow-lg hover:shadow-xl transition-all border border-green-100">
+            <div className="bg-gradient-to-r from-green-100 to-green-50 p-4 rounded-bl-xl rounded-tr-xl mb-4">
               <h3 className="text-xl font-semibold text-green-600">Previous Year Questions</h3>
             </div>
-            <p className="text-gray-700">
+            <p className="text-green-100">
               Practice with PYQs for mid-term, end-term and mini exams to ace your examinations.
             </p>
           </div>
 
           {/* Feature Card 3 */}
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all border border-purple-100">
-            <div className="bg-gradient-to-r from-purple-100 to-purple-50 p-4 rounded-lg mb-4">
+          <div className="bg-slate-900 hover:bg-slate-800 p-8 rounded-3xl rounded-tr-xs shadow-lg hover:shadow-xl transition-all border border-purple-100">
+            <div className="bg-gradient-to-r from-purple-100 to-purple-50 p-4 rounded-bl-xl rounded-tr-xl mb-4 ">
               <h3 className="text-xl font-semibold text-purple-600">Community Driven</h3>
             </div>
-            <p className="text-gray-700">
+            <p className="text-purple-100">
               Upvote the best content and help others find quality resources through our rating system.
             </p>
           </div>
