@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import React from 'react';
 import { getBranchesForYear, getSubjectsForYearAndBranch } from '../services/subjects';
+import { Link } from 'react-router-dom';
 
 const PyqsPage = () => {
   const [pyqs, setPyqs] = useState([]);
@@ -303,11 +304,19 @@ const PyqsPage = () => {
                             </button>
                           </div>
                         </div>
-  
+
                         <div className="mt-4 space-y-2 text-gray-600">
                           <div>Year: {pyq.year}</div>
                           <div>Branch: {pyq.branch}</div>
-                          <div>Uploaded by: {pyq.uploadedBy.name}</div>
+                          <span>
+                        Uploaded by:{' '}
+                        <Link
+                          to={`/Profile/${pyq.uploadedBy._id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {pyq.uploadedBy.name}
+                        </Link>
+                      </span>
                         </div>
   
                         <div className="mt-6">

@@ -11,6 +11,7 @@ import UploadPyqsPage from './pages/UploadPyqsPage';
 import Navbar from './components/Navbar';
 import { AuthProvider } from './context/AuthContext';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
 import MyNotes from './pages/MyNotes';
 import MyPyqs from './pages/MyPyqs';
 import About from './pages/About'
@@ -39,6 +40,7 @@ function App() {
             <Route path="/upload-notes" element={<UploadNotesPage/>} />
             <Route path="/upload-pyqs" element={<UploadPyqsPage />} />
             <Route path="/Profile" element={<Profile />} />
+            <Route path="/Profile/:userId" element={<UserProfile />} />
             <Route path="/my-notes" element={<MyNotes />} />
             <Route path="/my-pyqs" element={<MyPyqs />} />
             <Route path="/About" element={<About />} />

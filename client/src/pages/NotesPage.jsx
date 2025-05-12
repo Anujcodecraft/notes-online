@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getBranchesForYear, getSubjectsForYearAndBranch } from "../services/subjects";
+import { Link } from "react-router-dom";
 
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
@@ -268,7 +269,19 @@ const NotesPage = () => {
                     </div>
 
                     <div className="mt-4 text-sm text-gray-600">
-                      Uploaded by: {note.uploadedBy.name}
+                      {/* Uploaded by: <Link to= '/'>{note.uploadedBy.name}</Link> */}
+
+                      <span>
+                        Uploaded by:{' '}
+                        <Link
+                          to={`/Profile/${note.uploadedBy._id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {note.uploadedBy.name}
+                        </Link>
+                      </span>
+
+
                     </div>
 
                     <div className="mt-6">
