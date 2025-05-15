@@ -28,11 +28,10 @@ const NotesPage = () => {
 
 
   useEffect(() => {
-  if (isAuthenticated) {
-  //  window.location.reload();
-
-  }
-});
+    if (isAuthenticated) {
+      //  window.location.reload();
+    }
+  });
 
   // Update available branches when year changes
   useEffect(() => {
@@ -92,7 +91,6 @@ const NotesPage = () => {
   };
 
   const fetchNotes = async (pageNum) => {
-     
     setLoading(true);
     setError("");
     try {
