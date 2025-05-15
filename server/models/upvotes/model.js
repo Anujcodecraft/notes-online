@@ -28,25 +28,25 @@ const upvotesSchema = mongoose.Schema({
 export const upvotesModel = mongoose.model("upvotes",upvotesSchema)
 
 
-Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
-  try {
-    const noteId = req.params.id;
-    const userId = req.user.id;
+// Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
+//   try {
+//     const noteId = req.params.id;
+//     const userId = req.user.id;
 
-    const note = await notesModel.findById(noteId);
+//     const note = await notesModel.findById(noteId);
 
-    if (!note) return res.status(404).json({ error: 'Note not found' });
+//     if (!note) return res.status(404).json({ error: 'Note not found' });
 
-    if (note.upvotes.includes(userId)) {
-      return res.status(400).json({ error: 'You have already upvoted this note' });
-    }
+//     if (note.upvotes.includes(userId)) {
+//       return res.status(400).json({ error: 'You have already upvoted this note' });
+//     }
 
-    note.upvotes.push(userId);
-    await note.save();
+//     note.upvotes.push(userId);
+//     await note.save();
 
-    res.status(200).json({ message: 'Note upvoted successfully', totalUpvotes: note.upvotes.length });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to upvote note', details: err.message });
-  }
-});
+//     res.status(200).json({ message: 'Note upvoted successfully', totalUpvotes: note.upvotes.length });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Failed to upvote note', details: err.message });
+//   }
+// });
