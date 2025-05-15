@@ -98,7 +98,7 @@ const NotesCard = ({
 <button
   onClick={() => handleUpvote(note._id)}
   className="flex items-center space-x-1"
-  title={isLiked ? "Upvoted" : "Upvote this note"}
+  title={isLiked  ? "Upvoted" : "Upvote this note"}
 >
   <svg
     xmlns="http://www.w3.org/2000/svg"
