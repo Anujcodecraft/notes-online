@@ -6,8 +6,6 @@ import {
 } from "../services/subjects";
 import { Link } from "react-router-dom";
 
-
-
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,14 +24,13 @@ const NotesPage = () => {
   const [availableBranches, setAvailableBranches] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
 
-  const {random,setRandom} = useState(1)
+  const { random, setRandom } = useState(1);
 
   useEffect(() => {
-  if (isAuthenticated) {
-  //  window.location.reload();
-
-  }
-});
+    if (isAuthenticated) {
+      //  window.location.reload();
+    }
+  });
 
   // Update available branches when year changes
   useEffect(() => {
@@ -84,14 +81,13 @@ const NotesPage = () => {
     if (isAuthenticated && page >= 0) {
       fetchNotes(page);
     }
-  }, [page,isAuthenticated]);
+  }, [page, isAuthenticated]);
 
   const handleViewPDF = (fileUrl) => {
     window.open(fileUrl, "_blank", "noopener,noreferrer");
   };
 
   const fetchNotes = async (pageNum) => {
-     
     setLoading(true);
     setError("");
     try {
@@ -175,15 +171,13 @@ const NotesPage = () => {
 
       const isAlreadyUpvoted = note.upvotes.includes(currentUser.ID);
 
-      console.log("in the upvote section",isAlreadyUpvoted);
+      console.log("in the upvote section", isAlreadyUpvoted);
       // Optimistic UI update
       setNotes((prevNotes) =>
         prevNotes.map((note) => {
           if (note._id === noteId) {
             const updatedUpvotes = isAlreadyUpvoted
-              ? note.upvotes.filter(
-                  (id) => id !== currentUser.ID
-                ) // remove upvote
+              ? note.upvotes.filter((id) => id !== currentUser.ID) // remove upvote
               : [...note.upvotes, currentUser.ID]; // add upvote
 
             return {
@@ -198,7 +192,7 @@ const NotesPage = () => {
         })
       );
 
-      console.log("the isalerady upvote is",isAlreadyUpvoted)
+      console.log("the isalerady upvote is", isAlreadyUpvoted);
       const response = isAlreadyUpvoted
         ? await fetch(
             `${import.meta.env.VITE_BASE_URL_BACKEND}/notes/${noteId}/upvote`,
@@ -223,14 +217,13 @@ const NotesPage = () => {
             }
           );
 
-          console.log("the response is",response)
+      console.log("the response is", response);
 
       if (!response.ok) {
         const errorData = await response.json();
-       
+
         throw new Error(errorData.error || "Failed to update upvote");
       }
-
     } catch (error) {
       console.error("Upvote error:", error);
       alert(error.message || "Something went wrong.");
@@ -324,15 +317,29 @@ const NotesPage = () => {
                     <div className="mt-4 text-sm text-gray-600">
                       {/* Uploaded by: <Link to= '/'>{note.uploadedBy.name}</Link> */}
 
-                      <span>
-                        Uploaded by:{" "}
+                      <div className="flex items-center mt-1">
+                        <span className="text-gray-600 text-sm mr-2">
+                          Uploaded by:
+                        </span>
                         <Link
                           to={`/Profile/${note.uploadedBy._id}`}
-                          className="font-semibold text-gray-600  hover:text-gray-900 transition-colors"
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-md transition-all duration-200"
                         >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-3.5 w-3.5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                           {note.uploadedBy.name}
                         </Link>
-                      </span>
+                      </div>
                     </div>
 
                     <div className="mt-6">
