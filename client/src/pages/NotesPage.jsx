@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getBranchesForYear, getSubjectsForYearAndBranch } from "../services/subjects";
-import { Link } from "react-router-dom";
+import {
+  getBranchesForYear,
+  getSubjectsForYearAndBranch,
+} from "../services/subjects";
+import NotesCard from "../components/NotesCard";
+
+
 
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
@@ -12,24 +17,31 @@ const NotesPage = () => {
   const [filters, setFilters] = useState({
     year: "",
     branch: "",
-    subject: ""
+    subject: "",
   });
-  const { isAuthenticated, currentUser } = useAuth();
-
+  const { isAuthenticated, currentUser, upvotedNoteIds, setUpvotedNoteIds } =
+    useAuth();
 
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   const [availableBranches, setAvailableBranches] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      //  window.location.reload();
+    }
+  });
 
   // Update available branches when year changes
   useEffect(() => {
     if (filters.year) {
       const branches = getBranchesForYear(filters.year);
       setAvailableBranches(branches);
-      
+
       // Reset branch filter if the current selection isn't valid for the new year
       if (filters.branch && !branches.includes(filters.branch)) {
-        setFilters(prev => ({ ...prev, branch: "", subject: "" }));
+        setFilters((prev) => ({ ...prev, branch: "", subject: "" }));
       }
     } else {
       setAvailableBranches([]);
@@ -40,12 +52,15 @@ const NotesPage = () => {
   // Update available subjects when year or branch changes
   useEffect(() => {
     if (filters.year && filters.branch) {
-      const subjects = getSubjectsForYearAndBranch(filters.year, filters.branch);
+      const subjects = getSubjectsForYearAndBranch(
+        filters.year,
+        filters.branch
+      );
       setAvailableSubjects(subjects);
-      
+
       // Reset subject filter if the current selection isn't valid for the new branch/year
       if (filters.subject && !subjects.includes(filters.subject)) {
-        setFilters(prev => ({ ...prev, subject: "" }));
+        setFilters((prev) => ({ ...prev, subject: "" }));
       }
     } else {
       setAvailableSubjects([]);
@@ -67,7 +82,9 @@ const NotesPage = () => {
     if (isAuthenticated && page >= 0) {
       fetchNotes(page);
     }
-  }, [page]);
+  }, [page,isAuthenticated]);
+
+
 
   const handleViewPDF = (fileUrl) => {
     window.open(fileUrl, "_blank", "noopener,noreferrer");
@@ -84,12 +101,17 @@ const NotesPage = () => {
       queryParams.append("page", pageNum);
 
       const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/notes?${queryParams.toString()}`, {
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token} `: ""
-        },
-      });
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_BASE_URL_BACKEND
+        }/notes?${queryParams.toString()}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token} ` : "",
+          },
+        }
+      );
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
@@ -106,11 +128,12 @@ const NotesPage = () => {
         uploadedBy: note.user || { name: "Unknown" },
         upvotes: note.upvotes || [],
         upvotesCount: note.upvotesCount || note.upvotes?.length || 0,
-      }));
+      }
+    ));
 
       setNotes(processedNotes);
-      if(data.length===0){
-        setHasMore(false)
+      if (data.length === 0) {
+        setHasMore(false);
       }
     } catch (e) {
       console.error("Error fetching notes:", e);
@@ -122,87 +145,25 @@ const NotesPage = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [name]: value,
       // Reset dependent filters when parent filter changes
-      ...(name === 'year' ? { branch: "", subject: "" } : {}),
-      ...(name === 'branch' ? { subject: "" } : {})
+      ...(name === "year" ? { branch: "", subject: "" } : {}),
+      ...(name === "branch" ? { subject: "" } : {}),
     }));
   };
 
-  const handleUpvote = async (noteId) => {
-    try {
-      if (!isAuthenticated || !currentUser?.emailtoSend) {
-        alert("Please login to upvote notes.");
-        return;
-      }
 
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please login to upvote notes.");
-        return;
-      }
-
-      const note = notes.find((n) => n._id === noteId);
-      if (!note) {
-        console.error("Note not found");
-        return;
-      }
-
-      const isAlreadyUpvoted = note.upvotes.includes(currentUser.emailtoSend);
-      if (isAlreadyUpvoted) {
-        alert("You have already upvoted this note.");
-        return;
-      }
-
-      // Optimistic UI update
-      setNotes(prevNotes =>
-        prevNotes.map(note => {
-          if (note._id === noteId) {
-            return {
-              ...note,
-              upvotes: [...note.upvotes, currentUser.emailtoSend],
-              upvotesCount: note.upvotesCount + 1,
-            };
-          }
-          return note;
-        })
-      );
-
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL_BACKEND}/notes/${noteId}/upvote`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify({ email: currentUser.emailtoSend }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update upvote");
-      }
-    } catch (error) {
-      console.error("Upvote error:", error);
-      alert(error.message || "Something went wrong.");
-      // Revert optimistic update on error
-      fetchNotes(page);
-    }
-  };
 
   const handleNextPage = () => {
-    setPage(prevPage => prevPage + 1);
+    setPage((prevPage) => prevPage + 1);
   };
 
   const handlePrevPage = () => {
-    setPage(prevPage => Math.max(0, prevPage - 1));
+    setPage((prevPage) => Math.max(0, prevPage - 1));
     setHasMore(true);
   };
-
   const renderNotesContent = () => {
     if (loading) {
       return (
@@ -225,85 +186,23 @@ const NotesPage = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {notes.map((note) => {
-              const hasUpvoted = currentUser?.emailtoSend
-                ? note.upvotes.includes(currentUser.emailtoSend)
-                : false;
 
               return (
-                <div key={note._id} className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
-                  <div className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">{note.subject}</h3>
-                        <div className="mt-2 text-sm text-gray-600">
-                          <div>Year: {note.year}</div>
-                          <div>Branch: {note.branch}</div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleUpvote(note._id)}
-                        disabled={hasUpvoted}
-                        className={`flex items-center space-x-1 ${
-                          hasUpvoted
-                            ? "text-green-600 cursor-not-allowed"
-                            : "text-gray-500 hover:text-green-600"
-                        }`}
-                        title={hasUpvoted ? "Already upvoted" : "Upvote this note"}
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6"
-                          fill={hasUpvoted ? "currentColor" : "none"}
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-                          />
-                        </svg>
-                        <span>{note.upvotesCount}</span>
-                      </button>
-                    </div>
-
-                    <div className="mt-4 text-sm text-gray-600">
-                      {/* Uploaded by: <Link to= '/'>{note.uploadedBy.name}</Link> */}
-
-                      <span>
-                        Uploaded by:{' '}
-                        <Link
-                            to={`/Profile/${note.uploadedBy._id}`}
-                            className="font-semibold text-gray-600  hover:text-gray-900 transition-colors"
-                          >
-                            {note.uploadedBy.name}
-                      </Link>
-                      </span>
-
-
-                    </div>
-
-                    <div className="mt-6">
-                      <button
-                        onClick={() => handleViewPDF(note.fileurl)}
-                        className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        View PDF
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <NotesCard notes={notes} page={page} setNotes={setNotes} fetchNotes={fetchNotes} note={note}  handleViewPDF={handleViewPDF} />
               );
             })}
           </div>
-          
+
           {/* Pagination Controls */}
           <div className="flex justify-between items-center mt-8">
             <button
               onClick={handlePrevPage}
               disabled={page === 0}
-              className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={`px-4 py-2 rounded-md ${
+                page === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               Previous
             </button>
@@ -311,7 +210,11 @@ const NotesPage = () => {
             <button
               onClick={handleNextPage}
               disabled={!hasMore}
-              className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={`px-4 py-2 rounded-md ${
+                !hasMore
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
               Next
             </button>
@@ -332,7 +235,9 @@ const NotesPage = () => {
           {Object.values(filters).some(Boolean) && (
             <div className="mt-6">
               <button
-                onClick={() => setFilters({ year: "", branch: "", subject: "" })}
+                onClick={() =>
+                  setFilters({ year: "", branch: "", subject: "" })
+                }
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Clear all filters
@@ -345,7 +250,11 @@ const NotesPage = () => {
           <button
             onClick={handlePrevPage}
             disabled={page === 0}
-            className={`px-4 py-2 rounded-md ${page === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className={`px-4 py-2 rounded-md ${
+              page === 0
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
             Previous
           </button>
@@ -353,7 +262,11 @@ const NotesPage = () => {
           <button
             onClick={handleNextPage}
             disabled={!hasMore}
-            className={`px-4 py-2 rounded-md ${!hasMore ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            className={`px-4 py-2 rounded-md ${
+              !hasMore
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            }`}
           >
             Next
           </button>
@@ -367,9 +280,12 @@ const NotesPage = () => {
       <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-16 bg-white rounded-xl shadow-sm">
-            <h3 className="text-lg font-medium text-gray-900">Please login to view notes</h3>
+            <h3 className="text-lg font-medium text-gray-900">
+              Please login to view notes
+            </h3>
             <p className="mt-1 text-sm text-gray-500">
-              You need to be logged in to access academic notes and study materials.
+              You need to be logged in to access academic notes and study
+              materials.
             </p>
           </div>
         </div>
@@ -398,7 +314,10 @@ const NotesPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Year Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="year">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="year"
+              >
                 Academic Year
               </label>
               <select
@@ -409,15 +328,20 @@ const NotesPage = () => {
                 onChange={handleFilterChange}
               >
                 <option value="">All Years</option>
-                {years.map(year => (
-                  <option key={year} value={year}>{year}</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Branch Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="branch">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="branch"
+              >
                 Branch
               </label>
               <select
@@ -429,15 +353,20 @@ const NotesPage = () => {
                 disabled={!filters.year}
               >
                 <option value="">All Branches</option>
-                {availableBranches.map(branch => (
-                  <option key={branch} value={branch}>{branch}</option>
+                {availableBranches.map((branch) => (
+                  <option key={branch} value={branch}>
+                    {branch}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Subject Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="subject">
+              <label
+                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor="subject"
+              >
                 Subject
               </label>
               <select
@@ -449,8 +378,10 @@ const NotesPage = () => {
                 disabled={!filters.branch}
               >
                 <option value="">All Subjects</option>
-                {availableSubjects.map(subject => (
-                  <option key={subject} value={subject}>{subject}</option>
+                {availableSubjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
                 ))}
               </select>
             </div>

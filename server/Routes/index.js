@@ -93,7 +93,7 @@ Router.post('/signup', async (req, res) => {
     return res.status(CREATED).json({
       message: "User Registered Successfully",
       token,
-      user: { nametoSend, emailtoSend, verified, role:user.role }
+      user: { nametoSend, emailtoSend, verified, role:user.role, ID:user._id }
     });
 
   } catch (error) {
@@ -122,7 +122,7 @@ Router.post('/login', async (req, res) => {
     const { name:nametoSend, email:emailtoSend, verified } = userone; // or newly created user
 
       res.cookie('token', token, {  maxAge: 7 * 24 * 60 * 60 * 1000 });
-      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role } });
+      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role, ID:userone._id } });
     } catch (err) {
       res.status(500).json({ error: 'Login failed', details: err.message });
     }
@@ -135,7 +135,7 @@ Router.get('/userdetails',mainmiddleware, async (req, res) =>{
     if(!user){
       return res.status(CONFLICT).json({message:"No user with the current id"});
     }
-    return res.status(OK).json({message:"Successfully fetched user detail", data: { nametoSend:user.name, emailtoSend:user.email, verified:user.verified, role:user.role }});
+    return res.status(OK).json({message:"Successfully fetched user detail", data: { nametoSend:user.name, emailtoSend:user.email, verified:user.verified, role:user.role,ID:id }});
   } catch (error) {
     return res.status(INTERNAL_SERVER_ERROR).json({
       message: error.message,
@@ -161,7 +161,7 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
           }
       }
       const token = generateToken({_id:user._id, email:email});
-      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role}, token });
+      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role, ID:user._id}, token });
   } catch (error) {
       return res.status(500).json({
           message: error.message,
@@ -387,13 +387,11 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
   try {
     const noteId = req.params.id;
     const email = req.body.email;
-    console.log("heyy")
-    const user = await userModel.findOne({ email: email });
-    // From middleware (decoded JWT)
-    console.log("the name of owner are",user)
 
-   
+
+    const user = await userModel.findOne({ email });
     if (!user) {
+      console.log("User not found in DB");
       return res.status(404).json({ error: 'User not found' });
     }
 
@@ -401,24 +399,79 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
     if (!note) {
       return res.status(404).json({ error: 'Note not found' });
     }
+    
 
-    // Check if the user has already upvoted
-    if (note.upvotes.includes(user._id)) {
-      return res.status(400).json({ error: 'You have already upvoted this PYQ' });
+    const alreadyUpvoted = note.upvotes.some(id => id.toString() === user._id.toString());
+    if (alreadyUpvoted) {
+      console.log("Already upvoted");
+      return res.status(400).json({ error: 'You have already upvoted this note' });
     }
 
     note.upvotes.push(user._id);
-    await note.save();
+   
+    if (!note.uploader) {
+      note.uploader = user._id; // or some default ID
+    }
+    await note.save(); // 🔥 Save point
+    console.log("Note saved successfully");
 
-    res.status(200).json({
+    return res.status(200).json({
       message: 'Note upvoted successfully',
       totalUpvotes: note.upvotes.length
     });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to upvote note', details: err.message });
+    console.error("🔥 ERROR:", err.message);
+    return res.status(500).json({ error: 'Failed to upvote note', details: err.message });
   }
 });
+
+
+
+Router.delete('/notes/:id/upvote', mainmiddleware, async (req, res) => {
+  try {
+    const noteId = req.params.id;
+    const email = req.body.email;
+
+    // Find the user
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      console.log("User not found in DB");
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Find the note
+    const note = await notesModel.findById(noteId);
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found' });
+    }
+
+    // Check if user has upvoted this note
+    const upvoteIndex = note.upvotes.findIndex(id => id.toString() === user._id.toString());
+    if (upvoteIndex === -1) {
+      console.log("User hasn't upvoted this note");
+      return res.status(400).json({ error: "You haven't upvoted this note yet" });
+    }
+
+    // Remove the upvote
+    note.upvotes.splice(upvoteIndex, 1);
+        if (!note.uploader) {
+      note.uploader = user._id; // or some default ID
+    }
+    await note.save();
+    console.log("Upvote removed successfully");
+
+    return res.status(200).json({
+      message: 'Upvote removed successfully',
+      totalUpvotes: note.upvotes.length
+    });
+
+  } catch (err) {
+    console.error("🔥 ERROR:", err.message);
+    return res.status(500).json({ error: 'Failed to remove upvote', details: err.message });
+  }
+});
+
 
 
   Router.get('/my-notes', async (req, res) => {
@@ -629,6 +682,28 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
   })
 
 
+
+  Router.get('/user-upvotes/:email', mainmiddleware, async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await userModel.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const upvotedNotes = await notesModel.find({ upvotes: user._id }, '_id');
+    const upvotedNoteIds = upvotedNotes.map(note => note._id);
+
+    res.status(200).json({ upvotedNoteIds });
+  } catch (err) {
+    console.error("Error fetching upvoted notes:", err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 Router.get("/Profile/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -669,3 +744,4 @@ Router.get("/Profile/:userId", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
