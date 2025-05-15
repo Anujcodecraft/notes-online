@@ -93,7 +93,7 @@ Router.post('/signup', async (req, res) => {
     return res.status(CREATED).json({
       message: "User Registered Successfully",
       token,
-      user: { nametoSend, emailtoSend, verified, role:user.role }
+      user: { nametoSend, emailtoSend, verified, role:user.role, ID:user._id }
     });
 
   } catch (error) {
@@ -122,7 +122,7 @@ Router.post('/login', async (req, res) => {
     const { name:nametoSend, email:emailtoSend, verified } = userone; // or newly created user
 
       res.cookie('token', token, {  maxAge: 7 * 24 * 60 * 60 * 1000 });
-      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role } });
+      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role, ID:userone._id } });
     } catch (err) {
       res.status(500).json({ error: 'Login failed', details: err.message });
     }
@@ -161,7 +161,7 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
           }
       }
       const token = generateToken({_id:user._id, email:email});
-      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role}, token });
+      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role, ID:user._id}, token });
   } catch (error) {
       return res.status(500).json({
           message: error.message,
