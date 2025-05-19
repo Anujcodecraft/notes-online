@@ -2,7 +2,7 @@ import express from 'express'
 import { userModel } from '../models/user/model.js';
 import pyqModel from '../models/pyq/model.js'
 import { CONFLICT, CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK } from '../utils/statuscode.js';
-import { mainmiddleware } from '../Middleware/index.js';
+import { checkEmail, mainmiddleware } from '../Middleware/index.js';
 import { generateToken } from '../services/auth.js';
 import { notesModel } from '../models/notes/model.js';
 import multer from 'multer';
@@ -68,7 +68,7 @@ export async function uploader(req) {
 }
 
 
-Router.post('/signup', async (req, res) => {
+Router.post('/signup', checkEmail,  async (req, res) => {
   try {
     console.log("yha huna");
 
@@ -103,7 +103,7 @@ Router.post('/signup', async (req, res) => {
 });
 
 
-Router.post('/login', async (req, res) => {
+Router.post('/login', checkEmail, async (req, res) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -142,9 +142,9 @@ Router.get('/userdetails',mainmiddleware, async (req, res) =>{
   });
   }
 })
-Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
+Router.post('/google-auth', verifyGoogleToken, checkEmail, async (req, res) => {
   try {
-      // console.log(req.user)
+      console.log(req.user)
       const { name, email, picture } = req.user;
       let user = await userModel.findOne({ email });
       if (!user) {
