@@ -57,13 +57,18 @@ const GoogleAuthButton = () => {
       })
       if(!response){
         console.log("Error in Authenticating through google");
-        toast.warning('Failed to Authenticate You');
+        toast('⚠️ Failed to Authenticate You');
+        return;
     }
     console.log("response of google auth ", response.data);
-    login(response.data.user, response.data.token)
-    navigate('/');
-    toast.success('Authenticated!!!');
-    } catch (error) {
+      login(response.data.user, response.data.token)
+      navigate('/');
+      toast.success('Authenticated!!!');
+  } catch (error) {
+      if (error.response && error.response.data) {
+      toast.error(error.response.data.message); // 👈 you catch the backend message here
+    }
+      // toast.error(`${error.message}`);
       console.error("Google Authentication failed:", error);
     }
   }

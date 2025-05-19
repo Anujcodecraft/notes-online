@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 
 import React from 'react';
 import GoogleAuthButton from '../components/GoogleButton';
+import { REGEX_EMAIL_TYPE } from '../lib';
+import toast from 'react-hot-toast';
 
 
 const LoginPage = () => {
@@ -30,7 +32,12 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+    const email = formData.email;
+    if(!REGEX_EMAIL_TYPE.test(email)){
+      toast("⚠️ Please use your student email id provided by the campus");
+      setLoading(false)
+      return ;
+    }
     try {
       const response = await fetch(`${import.meta.env.VITE_BASE_URL_BACKEND}/login`, {
         method: 'POST',
