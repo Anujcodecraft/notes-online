@@ -43,9 +43,11 @@ ManitStudyPortal is a MERN-based web application designed specifically for our c
 
 ### Engagement Summary
 
-![User Overview](./assets/analytics-overview-1.png)
+![image](https://github.com/user-attachments/assets/e6a8e588-914a-4add-9ed8-3e8df8dc9fe8)
 
-- **Active Users**: 376  
+
+- **Active Users**: 376
+- **Total Users**: 500+
 - **Engagement Rate**: 86.4%  
 - **Total Views**: 14,000  
 - **Event Count**: 20,000  
@@ -54,7 +56,8 @@ ManitStudyPortal is a MERN-based web application designed specifically for our c
 
 ### Page Views & Stickiness
 
-![Page Views](./assets/analytics-overview-2.png)
+![image](https://github.com/user-attachments/assets/cbf43fa7-a8e1-4ea6-9d71-a18047ab856d)
+
 
 - **Page Views**: 14K for `AcademicHub - Notes`
 - **User Stickiness**:
