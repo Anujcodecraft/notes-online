@@ -18,6 +18,27 @@ ManitStudyPortal is a MERN-based web application designed specifically for our c
 
 ---
 
+![image](https://github.com/user-attachments/assets/f3dbafe8-e671-4ec9-b946-2523cdb01613)
+
+![image](https://github.com/user-attachments/assets/5295d0f5-fedc-4eef-95fe-481925618dee)
+
+![image](https://github.com/user-attachments/assets/cb4a3a6b-7005-421a-b800-79ad247f5b4d)
+
+![image](https://github.com/user-attachments/assets/e9e28c5f-8d54-4b49-a884-a8a91726bb9f)
+
+![image](https://github.com/user-attachments/assets/8529d1bd-6ca7-4d28-9c41-e66dcde57aa4)
+
+![image](https://github.com/user-attachments/assets/8fc31beb-9fc1-4dda-b40c-3c418c7094de)
+
+![image](https://github.com/user-attachments/assets/aad0dcd7-3f12-4fb8-925e-e81c23ae3097)
+
+
+
+
+
+
+
+
 ## 📈 Analytics Overview (Last 28 Days)
 
 ### Engagement Summary
