@@ -76,7 +76,7 @@ ManitStudyPortal is a MERN-based web application designed specifically for our c
 | **Node.js** | Runtime |
 | **Firebase** | Authentication |
 | **Cloudinary** | File uploads |
-| **Supabase** | Backend services |
+| **Supabase** | File uploads  |
 | **Google Analytics** | Tracking & insights |
 
 ---
