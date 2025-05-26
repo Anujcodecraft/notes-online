@@ -1,8 +1,9 @@
-# 🎓 AcademicHub - College Study Portal
+# 🎓 ManitStudyPortal - College Study Portal
 
-AcademicHub is a MERN-based web application designed specifically for our college students. It allows verified students to upload and share study materials including notes, previous year questions (PYQs), and assignments. Other students can browse, upvote, and access these resources securely using Google Authentication via Firebase.
+ManitStudyPortal is a MERN-based web application designed specifically for our college students. It allows verified students to upload and share study materials including notes, previous year questions (PYQs), and assignments. Other students can browse, upvote, and access these resources securely using Google Authentication via Firebase.
 
-![AcademicHub Screenshot](./assets/academic-analytics-main.png)
+![image](https://github.com/user-attachments/assets/fc9ed044-fb3d-455b-8e86-d995e2dbc30a)
+
 
 ## 🚀 Features
 
