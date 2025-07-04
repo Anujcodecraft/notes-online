@@ -2,7 +2,7 @@ import express from 'express'
 import { userModel } from '../models/user/model.js';
 import pyqModel from '../models/pyq/model.js'
 import { CONFLICT, CREATED, INTERNAL_SERVER_ERROR, NO_CONTENT, OK } from '../utils/statuscode.js';
-import { mainmiddleware } from '../Middleware/index.js';
+import { checkEmail, mainmiddleware } from '../Middleware/index.js';
 import { generateToken } from '../services/auth.js';
 import { notesModel } from '../models/notes/model.js';
 import multer from 'multer';
@@ -68,7 +68,7 @@ export async function uploader(req) {
 }
 
 
-Router.post('/signup', async (req, res) => {
+Router.post('/signup', checkEmail,  async (req, res) => {
   try {
     console.log("yha huna");
 
@@ -93,7 +93,7 @@ Router.post('/signup', async (req, res) => {
     return res.status(CREATED).json({
       message: "User Registered Successfully",
       token,
-      user: { nametoSend, emailtoSend, verified, role:user.role }
+      user: { nametoSend, emailtoSend, verified, role:user.role, ID:user._id }
     });
 
   } catch (error) {
@@ -103,7 +103,7 @@ Router.post('/signup', async (req, res) => {
 });
 
 
-Router.post('/login', async (req, res) => {
+Router.post('/login', checkEmail, async (req, res) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
@@ -122,7 +122,7 @@ Router.post('/login', async (req, res) => {
     const { name:nametoSend, email:emailtoSend, verified } = userone; // or newly created user
 
       res.cookie('token', token, {  maxAge: 7 * 24 * 60 * 60 * 1000 });
-      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role } });
+      res.status(200).json({ token,  user: { nametoSend, emailtoSend, verified, role:userone.role, ID:userone._id } });
     } catch (err) {
       res.status(500).json({ error: 'Login failed', details: err.message });
     }
@@ -142,9 +142,9 @@ Router.get('/userdetails',mainmiddleware, async (req, res) =>{
   });
   }
 })
-Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
+Router.post('/google-auth', verifyGoogleToken, checkEmail, async (req, res) => {
   try {
-      // console.log(req.user)
+      console.log(req.user)
       const { name, email, picture } = req.user;
       let user = await userModel.findOne({ email });
       if (!user) {
@@ -161,7 +161,7 @@ Router.post('/google-auth', verifyGoogleToken, async (req, res) => {
           }
       }
       const token = generateToken({_id:user._id, email:email});
-      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role}, token });
+      res.status(200).json({ user: {nametoSend:name, emailtoSend:email, verified:true, role:user.role, ID:user._id}, token });
   } catch (error) {
       return res.status(500).json({
           message: error.message,

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import GoogleAuthButton from '../components/GoogleButton';
+import { REGEX_EMAIL_TYPE } from '../lib';
 
 const SignupPage = () => {
   const [step, setStep] = useState(1); // 1: Name, 2: Email & OTP, 3: Password
@@ -39,8 +40,8 @@ const SignupPage = () => {
     
     if (stepNumber === 2 && !formData.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (stepNumber === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+    } else if (stepNumber === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) ) {
+      newErrors.email = 'Do enter the valid email id';
     }
     
     if (stepNumber === 3 && !formData.password) {
@@ -48,13 +49,17 @@ const SignupPage = () => {
     } else if (stepNumber === 3 && formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-    
+    if(stepNumber===4 && !REGEX_EMAIL_TYPE.test(formData.email)){
+      newErrors.email = 'Email should be of manit campus';
+      toast('⚠️ Do enter the valid email id of campus')
+    } 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const sendOTP = async () => {
     if (!validateStep(2)) return;
+    if(!validateStep(4)) return;
     
     setLoading(true);
     try {
