@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -5,7 +6,7 @@ import {
   getSubjectsForYearAndBranch,
 } from "../services/subjects";
 import NotesCard from "../components/NotesCard";
-
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const NotesPage = () => {
