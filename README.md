@@ -92,8 +92,8 @@ ManitStudyPortal is a MERN-based web application designed specifically for our c
 ### Clone and Run
 
 ```bash
-git clone https://github.com/your-username/AcademicHub.git
-cd AcademicHub
+git clone https://github.com/Anujcodecraft/notes-online
+cd notes-online
 
 # Backend
 cd backend
