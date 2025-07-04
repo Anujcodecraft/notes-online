@@ -1,4 +1,5 @@
 # 🎓 ManitStudyPortal - College Study Portal
+[🌐 Live Demo](https://manitstudyportal.netlify.app/)
 
 ManitStudyPortal is a MERN-based web application designed specifically for our college students. It allows verified students to upload and share study materials including notes, previous year questions (PYQs), and assignments. Other students can browse, upvote, and access these resources securely using Google Authentication via Firebase.
 
