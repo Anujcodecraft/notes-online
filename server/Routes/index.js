@@ -194,7 +194,7 @@ Router.post('/upload-notes', mainmiddleware, upload.single('file'), async (req, 
       year,
       branch,
       subject,
-      user: UUser._id,
+      uploader: UUser._id,
       fileurl: url,
     });
     console.log("the uploader id is as follows",note.user, url)
@@ -306,9 +306,8 @@ Router.use((err, req, res, next) => {
           year: sanitizedYear,
           branch,
           subject: sanitizedSubject,
-          user: UUser._id,
+          uploader: UUser._id,
           fileurl: url,
-          // Remove this line: upvotes: 0,
           createdAt: new Date()
         });
         console.log("the user uploader is",pyq, url);
@@ -409,9 +408,11 @@ Router.post('/notes/:id/upvote', mainmiddleware, async (req, res) => {
 
     note.upvotes.push(user._id);
    
-    if (!note.uploader) {
-      note.uploader = user._id; // or some default ID
-    }
+    // This is wrong, setting the current users id as the uploader isnt supposed to happen.
+    // it should set uploader id only when creating the note & it should be the uploader id.
+    // This is the reason why notes upvote worked, because you are uploading the user id when creating the post but not uploader
+    // so it is empty but when u do this the db will not return a error when saving because if was set to user._id before saving
+
     await note.save(); // 🔥 Save point
     console.log("Note saved successfully");
 

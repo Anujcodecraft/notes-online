@@ -20,12 +20,8 @@ const pyqSchema = new mongoose.Schema({
   },
   uploader: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'user',
     required: true,
-  },
-  branch: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Branch',
   },
   fileurl: {
     type: String,
