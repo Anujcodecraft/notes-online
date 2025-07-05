@@ -135,7 +135,7 @@ const PyqsPage = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Please login to upvote.');
+        toast.warn("please login to upvote")
         return;
       }
 
@@ -159,7 +159,6 @@ const PyqsPage = () => {
         //toast notification
         toast.success('Upvoted successfully!');
       } else {
-        alert(`Error: ${data.error}`);
         toast.error(`Upvote failed!`);
       }
     } catch (error) {
