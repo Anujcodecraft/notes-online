@@ -26,7 +26,6 @@ function App() {
       <Router>
         <GAListener />
         <div className="min-h-screen bg-gray-50">
-        <Toaster position="top-right" reverseOrder={false} />
           <Navbar />
           <Routes>
             <Route path="/" element={<LandingPage />} />
