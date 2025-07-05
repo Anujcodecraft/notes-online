@@ -18,7 +18,6 @@ import About from './pages/About'
 import ContactUs from './pages/ContactUs'
 import ReactGA from "react-ga4";
 import usePageTracking from './hooks/usePageTracking';
-import { Toaster } from 'react-hot-toast';
 
 ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
 function App() {

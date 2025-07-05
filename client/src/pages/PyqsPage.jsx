@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import React from 'react';
 import { getBranchesForYear, getSubjectsForYearAndBranch } from '../services/subjects';
 import { Link } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 const PyqsPage = () => {
   const [pyqs, setPyqs] = useState([]);
@@ -153,12 +156,15 @@ const PyqsPage = () => {
             pyq._id === id ? { ...pyq, upvotes: [...pyq.upvotes, currentUser.emailtoSend] } : pyq
           )
         );
+        //toast notification
+        toast.success('Upvoted successfully!');
       } else {
         alert(`Error: ${data.error}`);
+        toast.error(`Upvote failed!`);
       }
     } catch (error) {
       console.error('Error during upvote:', error);
-      alert('Something went wrong while upvoting.');
+      toast.error(`Something went wrong while upvoting.`);
     }
   };
 
@@ -400,6 +406,7 @@ const PyqsPage = () => {
           </div>
         </div>
       )}
+      <Toaster />
     </>
   );
 };
