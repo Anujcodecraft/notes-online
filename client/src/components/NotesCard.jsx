@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast, { Toaster } from 'react-hot-toast';
 
 const NotesCard = ({
   note,
@@ -64,7 +65,10 @@ const NotesCard = ({
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error("Failed to upvote!");
         throw new Error(errorData.error || "Failed to update upvote");
+      } else {
+        toast.success(`Upvoted successfully!`);
       }
 
       // Optimistic UI update
@@ -74,7 +78,7 @@ const NotesCard = ({
       setNotes(updatedNotes);
     } catch (error) {
       console.error("Upvote error:", error);
-      alert(error.message || "Something went wrong.");
+      toast.error("Something went wrong!");
       // Revert optimistic update
       fetchNotes(page);
     }
@@ -82,6 +86,7 @@ const NotesCard = ({
   };
 
   return (
+    <>
     <div
       key={note._id}
       className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
@@ -143,6 +148,8 @@ const NotesCard = ({
         </div>
       </div>
     </div>
+    <Toaster/>
+    </>
   );
 };
 

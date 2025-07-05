@@ -6,7 +6,6 @@ import {
   getSubjectsForYearAndBranch,
 } from "../services/subjects";
 import NotesCard from "../components/NotesCard";
-import { ToastContainer, toast } from 'react-toastify';
 
 
 const NotesPage = () => {
