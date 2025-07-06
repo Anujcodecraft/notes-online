@@ -68,7 +68,7 @@ const NotesCard = ({
         toast.error("Failed to upvote!");
         throw new Error(errorData.error || "Failed to update upvote");
       } else {
-        toast.success(`${isLiked ?? 'Downvoted': 'Upvoted'} successfully!`);
+        toast.success(`${isLiked ? 'Downvoted': 'Upvoted'} successfully!`);
       }
 
       // Optimistic UI update
