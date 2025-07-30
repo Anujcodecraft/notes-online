@@ -19,10 +19,10 @@ const UploadNotesPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  // if (currentUser.role !== "uploader") {
-  //   // alert("You are not allowed to upload things")
-  //   navigate("/");
-  // }
+  if (currentUser.role !== "uploader") {
+    // alert("You are not allowed to upload things")
+    navigate("/");
+  }
 
   // Options for dropdowns
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
