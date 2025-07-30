@@ -27,12 +27,25 @@ export const ThemeProvider = ({ children }) => {
   // This applies the class to <html>
   useEffect(() => {
     const html = document.documentElement;
+
+    // Add a class to trigger transition
+    html.classList.add("theme-transition");
+
+    // Apply theme class
     if (theme === "dark") {
       html.classList.add("dark");
     } else {
       html.classList.remove("dark");
     }
+
     localStorage.setItem("theme", theme);
+
+    // Remove transition class after animation ends
+    const timeout = setTimeout(() => {
+      html.classList.remove("theme-transition");
+    }, 300); // Match the CSS duration
+
+    return () => clearTimeout(timeout);
   }, [theme]);
 
   return (

@@ -1,25 +1,50 @@
-import { useState, useEffect } from 'react';
-import { User, Book, FileQuestion, FileCheck, LogOut, X, Home, Info, Mail } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
-import manitLogo from '../assets/manit-logo.png';
-import React from 'react';
+import React, { useState, useEffect, useContext } from "react";
+import {
+  User,
+  Book,
+  FileQuestion,
+  FileCheck,
+  LogOut,
+  X,
+  Home,
+  Info,
+  Mail,
+  Moon,
+  Sun,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+import manitLogo from "../assets/manit-logo.png";
+import { ThemeContext } from "../context/ThemeContext";
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentUser, logout, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
+  // 👇 Apply `dark` class to <html> when theme changes
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
+  // 👇 Handle click outside sidebar to close
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarOpen && !event.target.closest('.sidebar') && 
-          !event.target.closest('.sidebar-toggle')) {
+      if (
+        sidebarOpen &&
+        !event.target.closest(".sidebar") &&
+        !event.target.closest(".sidebar-toggle")
+      ) {
         setSidebarOpen(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -28,47 +53,51 @@ export default function Navbar() {
     try {
       await logout();
       setSidebarOpen(false);
-      navigate('/');
+      navigate("/");
     } catch (error) {
       console.error("Failed to logout:", error);
     }
   };
 
   const menuItems = [
-    { id: 'Profile', icon: User, label: 'Profile' },
-    { id: 'my-notes', icon: Book, label: 'My Notes' },
-    { id: 'my-pyqs', icon: FileQuestion, label: 'PYQs Uploaded' },
-    { id: 'solutions', icon: FileCheck, label: 'Solutions Uploaded' },
-    { id: 'About', icon: Info, label: 'About Us' },
-    { id: 'ContactUs', icon: Mail, label: 'Contact Us' },
+    { id: "Profile", icon: User, label: "Profile" },
+    { id: "my-notes", icon: Book, label: "My Notes" },
+    { id: "my-pyqs", icon: FileQuestion, label: "PYQs Uploaded" },
+    { id: "solutions", icon: FileCheck, label: "Solutions Uploaded" },
+    { id: "About", icon: Info, label: "About Us" },
+    { id: "ContactUs", icon: Mail, label: "Contact Us" },
   ];
 
   return (
     <>
-      {/* Navbar - Always on top */}
-      <header className="bg-blue-100 shadow-md fixed top-0 w-full z-50">
+      <header className="bg-blue-100 dark:bg-gray-900 dark:text-white shadow-md fixed top-0 w-full z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center space-x-4">
-              <img 
-                src={manitLogo} 
-                alt="MANIT Logo" 
-                className="h-12 w-12 object-contain"
+          <div className="flex justify-between items-center h-16">
+            {/* Logo & Title */}
+            <div className="flex items-center space-x-3">
+              <img
+                src={manitLogo}
+                alt="MANIT Logo"
+                className="h-10 w-10 object-contain"
               />
-              <Link to="/" className="text-xl md:text-2xl font-bold text-blue-700">
+              <Link
+                to="/"
+                className="text-lg sm:text-xl md:text-2xl font-bold text-blue-700 dark:text-white whitespace-nowrap"
+              >
                 ManitStudyPortal
               </Link>
             </div>
 
-            <div className="hidden md:flex items-center space-x-4">
+            {/* Desktop Section */}
+            <div className="hidden md:flex items-center space-x-3">
               {isAuthenticated && (
                 <Link
                   to="/"
-                  className="p-2 mr-2 rounded-full hover:bg-blue-200 transition-colors group relative"
+                  className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition"
                   aria-label="Home"
                 >
-                  <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-md group-hover:bg-blue-50 transition-colors">
-                    <Home className="h-5 w-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                  <div className="h-10 w-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-md">
+                    <Home className="h-5 w-5 text-blue-600 dark:text-white" />
                   </div>
                 </Link>
               )}
@@ -76,106 +105,140 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <button
                   onClick={toggleSidebar}
-                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors mr-2"
+                  className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition"
                   aria-label="Open user menu"
                 >
-                  <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md">
+                  <div className="h-10 w-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md">
                     <User className="h-6 w-6" />
                   </div>
                 </button>
               ) : (
-                <div className="flex space-x-4">
+                <>
                   <Link
                     to="/login"
-                    className="px-4 py-2 rounded-md text-blue-600 hover:bg-blue-50 transition"
+                    className="px-4 py-2 text-sm font-medium text-blue-600 dark:text-white hover:bg-blue-50 dark:hover:bg-gray-800 rounded-md transition"
                   >
                     Login
                   </Link>
                   <Link
                     to="/signup"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                    className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                   >
                     Sign Up
                   </Link>
-                </div>
+                </>
               )}
+
+              {/* Theme Toggle (Visible to all users) */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-700 transition"
+                aria-label="Toggle Theme"
+              >
+                <div className="h-10 w-10 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center shadow-md">
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="h-5 w-5 text-blue-700" />
+                  )}
+                </div>
+              </button>
             </div>
 
-            <div className="md:hidden flex items-center">
+            {/* Mobile Buttons */}
+            <div className="md:hidden flex items-center space-x-2">
               {isAuthenticated ? (
-                <button
-                  onClick={toggleSidebar}
-                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors"
-                  aria-label="Open user menu"
+                <>
+                  <button
+                    onClick={toggleSidebar}
+                    className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition"
+                    aria-label="Open user menu"
+                  >
+                    <div className="h-10 w-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md">
+                      <User className="h-6 w-6" />
+                    </div>
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition"
+                  aria-label="Login"
                 >
-                  <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md">
+                  <div
+                    title="Login"
+                    className="h-10 w-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md"
+                  >
                     <User className="h-6 w-6" />
                   </div>
-                </button>
-              ) : (
-                <div className="flex space-x-2">
-                  <Link
-                    to="/login"
-                    className="px-3 py-1 rounded-md text-blue-600 hover:bg-blue-50 transition text-sm"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/signup"
-                    className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
+                </Link>
               )}
+
+              {/* Theme Toggle (mobile) */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-700 transition"
+                aria-label="Toggle Theme"
+              >
+                <div className="h-10 w-10 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center shadow-md">
+                  {theme === "dark" ? (
+                    <Sun className="h-5 w-5 text-yellow-400" />
+                  ) : (
+                    <Moon className="h-5 w-5 text-blue-700" />
+                  )}
+                </div>
+              </button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Sidebar with translucent background */}
+      {/* Sidebar */}
       <div
-        className={`sidebar fixed inset-y-0 right-0 w-64 bg-blue-100/95 shadow-lg transform ${
-          sidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`sidebar fixed inset-y-0 right-0 w-64 bg-blue-100 dark:bg-gray-800 shadow-lg transform ${
+          sidebarOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out z-40`}
       >
-        <div className="flex flex-col h-full p-4">
-          <div className="flex justify-between items-center mb-6 pb-4 border-b border-blue-700">
-            <h2 className="text-lg font-semibold text-black">User Menu</h2>
+        <div className="flex flex-col h-full p-4 text-black dark:text-white">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6 pb-4 border-b border-blue-700 dark:border-gray-600">
+            <h2 className="text-lg font-semibold">User Menu</h2>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded-full hover:bg-blue-700 text-black hover:text-white"
-              aria-label="Close menu"
+              className="p-2 rounded-full hover:bg-blue-300 dark:hover:bg-gray-700 transition"
+              aria-label="Close sidebar"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <nav className="flex-1">
+          {/* Navigation Links */}
+          <nav className="flex-1 overflow-y-auto">
             <ul className="space-y-2">
               {menuItems.map(({ id, icon: Icon, label }) => (
                 <li key={id}>
                   <Link
                     to={`/${id}`}
                     onClick={() => setSidebarOpen(false)}
-                    className="flex items-center px-4 py-3 text-black rounded-lg hover:bg-blue-300 transition"
+                    className="flex items-center px-4 py-2 rounded-md hover:bg-blue-300 dark:hover:bg-gray-700 transition"
                   >
                     <Icon className="mr-3 h-5 w-5" />
-                    <span>{label}</span>
+                    <span className="text-sm font-medium">{label}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
+          {/* Logout (Sticky to bottom) */}
           {isAuthenticated && (
-            <div className="mt-auto pt-4 border-t border-blue-700">
+            <div className="mt-auto pt-4 border-t border-blue-700 dark:border-gray-600">
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+                className="flex items-center justify-start w-full px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition"
               >
                 <LogOut className="mr-3 h-5 w-5" />
-                <span>Logout</span>
+                <span className="text-sm font-medium">Logout</span>
               </button>
             </div>
           )}
