@@ -8,7 +8,6 @@ import {
 import NotesCard from "../components/NotesCard";
 import Spinner from "../components/Spinner";
 
-
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +25,6 @@ const NotesPage = () => {
   const years = ["First Year", "Second Year", "Third Year", "Fourth Year"];
   const [availableBranches, setAvailableBranches] = useState([]);
   const [availableSubjects, setAvailableSubjects] = useState([]);
-
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -83,9 +81,7 @@ const NotesPage = () => {
     if (isAuthenticated && page >= 0) {
       fetchNotes(page);
     }
-  }, [page,isAuthenticated]);
-
-
+  }, [page, isAuthenticated]);
 
   const handleViewPDF = (fileUrl) => {
     window.open(fileUrl, "_blank", "noopener,noreferrer");
@@ -129,8 +125,7 @@ const NotesPage = () => {
         uploadedBy: note.user || { name: "Unknown" },
         upvotes: note.upvotes || [],
         upvotesCount: note.upvotesCount || note.upvotes?.length || 0,
-      }
-    ));
+      }));
 
       setNotes(processedNotes);
       if (data.length === 0) {
@@ -155,8 +150,6 @@ const NotesPage = () => {
     }));
   };
 
-
-
   const handleNextPage = () => {
     setPage((prevPage) => prevPage + 1);
   };
@@ -169,8 +162,8 @@ const NotesPage = () => {
     if (loading) {
       return (
 
-        <Spinner />
 
+        <Spinner />
 
       );
     }
@@ -180,7 +173,6 @@ const NotesPage = () => {
 
         <div className="bg-red-50 dark:bg-red-900 border-l-4 border-red-400 dark:border-red-500 p-4 mb-6 rounded">
           <p className="text-sm text-red-700 dark:text-red-100">{error}</p>
-
 
         </div>
       );
@@ -250,7 +242,6 @@ const NotesPage = () => {
             No notes found
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-
             {Object.values(filters).some(Boolean)
               ? "Try adjusting your search or filter to find what you're looking for."
               : "Please select filters to view notes."}
@@ -303,7 +294,7 @@ const NotesPage = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 mt-12">
         <div className="max-w-7xl mx-auto">
 
           <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
@@ -322,14 +313,14 @@ const NotesPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 mt-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8 mt-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl sm:tracking-tight lg:text-6xl">
             Academic Notes
           </h1>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+          <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 dark:text-gray-300 sm:mt-4">
             Access study materials and notes shared by students
           </p>
         </div>
@@ -338,22 +329,20 @@ const NotesPage = () => {
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mb-10">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
-
             Filter Notes
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Year Filter */}
             <div>
               <label
-
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
 
                 htmlFor="year"
               >
                 Academic Year
               </label>
               <select
-
+              
                 className="block w-full pl-3 pr-10 py-2 text-base bg-white dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md border"
 
                 id="year"
@@ -430,7 +419,7 @@ const NotesPage = () => {
           </div>
         </div>
 
-        {/* Notes Content */}
+        {/* Notes */}
         {renderNotesContent()}
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 
 const NotesCard = ({
   note,
@@ -68,7 +68,7 @@ const NotesCard = ({
         toast.error("Failed to upvote!");
         throw new Error(errorData.error || "Failed to update upvote");
       } else {
-        toast.success(`${isLiked ? 'Downvoted': 'Upvoted'} successfully!`);
+        toast.success(`${isLiked ? "Downvoted" : "Upvoted"} successfully!`);
       }
 
       // Optimistic UI update
@@ -87,68 +87,73 @@ const NotesCard = ({
 
   return (
     <>
-    <div
-      key={note._id}
-      className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-    >
-      <div className="p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-xl font-bold text-gray-900">{note.subject}</h3>
-            <div className="mt-2 text-sm text-gray-600">
-              <div>Year: {note.year}</div>
-              <div>Branch: {note.branch}</div>
+      <div
+        key={note._id}
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                {note.subject}
+              </h3>
+              <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                <div>Year: {note.year}</div>
+                <div>Branch: {note.branch}</div>
+              </div>
             </div>
-          </div>
-<button
-  onClick={() => handleUpvote(note._id)}
-  className="flex items-center space-x-1"
-  title={isLiked  ? "Upvoted" : "Upvote this note"}
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className={`h-6 w-6 ${isLiked ? "text-blue-600" : "text-gray-400"}`}
-    fill={isLiked ? "currentColor" : "none"}
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
-    />
-  </svg>
-  <span className="text-gray-700">{note.upvotesCount}</span>
-</button>
 
-        </div>
-
-        <div className="mt-4 text-sm text-gray-600">
-          {/* Uploaded by: <Link to= '/'>{note.uploadedBy.name}</Link> */}
-
-          <span>
-            Uploaded by:{" "}
-            <Link
-              to={`/Profile/${note.uploadedBy._id}`}
-              className="font-semibold text-gray-600  hover:text-gray-900 transition-colors"
+            <button
+              onClick={() => handleUpvote(note._id)}
+              className="flex items-center space-x-1"
+              title={isLiked ? "Upvoted" : "Upvote this note"}
             >
-              {note.uploadedBy.name}
-            </Link>
-          </span>
-        </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-6 w-6 ${
+                  isLiked ? "text-blue-600" : "text-gray-400 dark:text-gray-500"
+                }`}
+                fill={isLiked ? "currentColor" : "none"}
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+                />
+              </svg>
+              <span className="text-gray-700 dark:text-gray-300">
+                {note.upvotesCount}
+              </span>
+            </button>
+          </div>
 
-        <div className="mt-6">
-          <button
-            onClick={() => handleViewPDF(note.fileurl)}
-            className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            View PDF
-          </button>
+          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+            <span>
+              Uploaded by:{" "}
+              <Link
+                to={`/Profile/${note.uploadedBy._id}`}
+                className="font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
+                {note.uploadedBy.name}
+              </Link>
+            </span>
+          </div>
+
+          <div className="mt-6">
+            <button
+              onClick={() => handleViewPDF(note.fileurl)}
+              className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800"
+            >
+              View PDF
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <Toaster/>
+
+      <Toaster />
     </>
   );
 };
