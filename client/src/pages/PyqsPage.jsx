@@ -1,11 +1,15 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import React from 'react';
-import { getBranchesForYear, getSubjectsForYearAndBranch } from '../services/subjects';
-import { Link } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
 
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import React from "react";
+import {
+  getBranchesForYear,
+  getSubjectsForYearAndBranch,
+} from "../services/subjects";
+import { Link } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
+import Spinner from "../components/Spinner";
 
 const PyqsPage = () => {
   const [pyqs, setPyqs] = useState([]);
@@ -276,9 +280,7 @@ const PyqsPage = () => {
             )}
   
             {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-green-600"></div>
-              </div>
+              <Spinner />
             ) : pyqs.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

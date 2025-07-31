@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { Trash2, Download, FileText, Clock, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import { Trash2, Download, FileText, Clock, BookOpen } from "lucide-react";
+import { motion } from "framer-motion";
+import Spinner from "../components/Spinner";
 
 const MyPyqs = () => {
 
@@ -30,6 +32,13 @@ const MyPyqs = () => {
         }, [currentUser]);
 
 
+
+  if (loading) {
+    return (
+      <Spinner />
+    );
+  }
+
         // const handleDelete = async (pyqId) => {
         //     setDeletingId(pyqId);
         //     try {
@@ -41,6 +50,7 @@ const MyPyqs = () => {
         //       setDeletingId(null);
         //     }
         //   };
+
 
 
         const handleDelete = async (pyqId) => {
