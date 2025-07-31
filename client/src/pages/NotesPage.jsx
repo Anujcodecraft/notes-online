@@ -6,6 +6,7 @@ import {
   getSubjectsForYearAndBranch,
 } from "../services/subjects";
 import NotesCard from "../components/NotesCard";
+import Spinner from "../components/Spinner";
 
 const NotesPage = () => {
   const [notes, setNotes] = useState([]);
@@ -160,9 +161,7 @@ const NotesPage = () => {
   const renderNotesContent = () => {
     if (loading) {
       return (
-        <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 dark:border-blue-400"></div>
-        </div>
+        <Spinner />
       );
     }
 
