@@ -11,6 +11,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import axios from "axios";
+import Spinner from "../components/Spinner";
 
 export default function UserPagePreview() {
   const { currentUser } = useAuth();
@@ -86,9 +87,7 @@ export default function UserPagePreview() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 dark:border-blue-400"></div>
-      </div>
+  <Spinner/>
     );
   }
   if (!currentUser) {
