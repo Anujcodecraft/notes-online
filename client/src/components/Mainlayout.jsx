@@ -1,24 +1,48 @@
-import React, { useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
-import LandingPage from '../pages/LandingPage';
-import { ThemeContext } from '../context/ThemeContext'; // 
+import LandingPage from './LandingPage';
+import React from 'react';
 
 const MainLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { theme, toggleTheme } = useContext(ThemeContext); 
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode !== null) {
+        return savedMode === 'true';
+      }
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const html = document.documentElement;
+    if (darkMode) {
+      html.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      html.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  }, [darkMode]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
   return (
-    <div className="relative transition-colors duration-500">
+    <div className="relative">
       <Navbar 
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
-        toggleDarkMode={toggleTheme} //  use context method
-        darkMode={theme === 'dark'} //  send theme info
+        toggleDarkMode={toggleDarkMode}
+        darkMode={darkMode}
       />
       <Sidebar 
         isOpen={isSidebarOpen}

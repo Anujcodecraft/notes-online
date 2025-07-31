@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -6,65 +7,31 @@ import { motion } from "framer-motion";
 import Spinner from "../components/Spinner";
 
 const MyPyqs = () => {
-  const { currentUser } = useAuth();
-  const [pyqs, setPyqs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState(null);
 
-  useEffect(() => {
-    const fetchPyqs = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BASE_URL_BACKEND}/my-pyqs?email=${
-            currentUser.emailtoSend
-          }`
-        );
-        setPyqs(res.data);
-      } catch (err) {
-        console.error("Error fetching notes:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const { currentUser } = useAuth();
+      const [pyqs, setPyqs] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [deletingId, setDeletingId] = useState(null);
 
-    if (currentUser?.emailtoSend) fetchPyqs();
-  }, [currentUser]);
+      
 
-  // const handleDelete = async (pyqId) => {
-  //     setDeletingId(pyqId);
-  //     try {
-  //       await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`);
-  //       setPyqs(pyqs.filter(pyq => pyq._id !== pyqId));
-  //     } catch (err) {
-  //       console.error('Failed to delete pyq:', err);
-  //     } finally {
-  //       setDeletingId(null);
-  //     }
-  //   };
 
-  const handleDelete = async (pyqId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this PYQ? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
+      useEffect(() => {
+          const fetchPyqs = async () => {
+            try {
+              const res = await axios.get(`${import.meta.env.VITE_BASE_URL_BACKEND}/my-pyqs?email=${currentUser.emailtoSend}`);
+              setPyqs(res.data);
+            } catch (err) {
+              console.error('Error fetching notes:', err);
+            } finally {
+              setLoading(false);
+            }
+          };
+      
+          if (currentUser?.emailtoSend) fetchPyqs();
+        }, [currentUser]);
 
-    setDeletingId(pyqId);
-    try {
-      await axios.delete(
-        `${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`
-      );
-      setPyqs(pyqs.filter((pyq) => pyq._id !== pyqId));
-      toast.success("PYQ deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete PYQ:", err);
-      toast.error("Failed to delete PYQ");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+
 
   if (loading) {
     return (
@@ -72,133 +39,153 @@ const MyPyqs = () => {
     );
   }
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-10">
-      {/* Heading */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-10"
-      >
-        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 flex items-center">
-          <BookOpen className="mr-3 text-blue-600" size={32} />
-          My Uploaded PYQs
-        </h2>
-        <p className="text-gray-600 dark:text-gray-300">
-          All the PYQs you've shared with the community
-        </p>
-      </motion.div>
+        // const handleDelete = async (pyqId) => {
+        //     setDeletingId(pyqId);
+        //     try {
+        //       await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`);
+        //       setPyqs(pyqs.filter(pyq => pyq._id !== pyqId));
+        //     } catch (err) {
+        //       console.error('Failed to delete pyq:', err);
+        //     } finally {
+        //       setDeletingId(null);
+        //     }
+        //   };
 
-      {/* Empty State */}
-      {pyqs.length === 0 ? (
+
+
+        const handleDelete = async (pyqId) => {
+          if (!window.confirm('Are you sure you want to delete this PYQ? This action cannot be undone.')) {
+            return;
+          }
+      
+          setDeletingId(pyqId);
+          try {
+            await axios.delete(`${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`);
+            setPyqs(pyqs.filter(pyq => pyq._id !== pyqId));
+            toast.success('PYQ deleted successfully');
+          } catch (err) {
+            console.error('Failed to delete PYQ:', err);
+            toast.error('Failed to delete PYQ');
+          } finally {
+            setDeletingId(null);
+          }
+        };
+
+
+          if (loading) {
+            return (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            );
+          }
+
+  return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mt-10">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="text-center py-20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-10"
         >
-          <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
-          <h3 className="text-xl font-medium text-gray-700 dark:text-gray-300">
-            No PYQs uploaded yet
-          </h3>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Start sharing your knowledge with the community!
+          <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-2 flex items-center">
+            <BookOpen className="mr-3 text-blue-600" size={32} />
+            My Uploaded Pyqs
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300">
+            All the pyqs you've shared with the community
           </p>
         </motion.div>
-      ) : (
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {pyqs.map((pyq) => (
-            <motion.div
-              key={pyq._id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              whileHover={{ y: -5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
-            >
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                  <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-                    {pyq.subject}
-                  </h3>
-                  <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                    {pyq.type || "PYQ"}
-                  </span>
-                </div>
-
-                {/* Metadata */}
-                <div className="mt-4 space-y-2">
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <span className="w-24 font-medium">Branch:</span>
-                    <span>{pyq.branch}</span>
+  
+        {pyqs.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-center py-20"
+          >
+            <FileText className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+            <h3 className="text-xl font-medium text-gray-700 dark:text-gray-300">
+              No pyqs uploaded yet
+            </h3>
+            <p className="mt-2 text-gray-500 dark:text-gray-400">
+              Start sharing your knowledge with the community!
+            </p>
+          </motion.div>
+        ) : (
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {pyqs.map((pyq) => (
+              <motion.div
+                key={pyq._id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                whileHover={{ y: -5 }}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                      {pyq.subject}
+                    </h3>
+                    <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                      {pyq.type || 'Note'}
+                    </span>
                   </div>
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <span className="w-24 font-medium">Year:</span>
-                    <span>{pyq.year}</span>
+  
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center text-gray-600 dark:text-gray-300">
+                      <span className="w-24 font-medium">Branch:</span>
+                      <span>{pyq.branch}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-300">
+                      <span className="w-24 font-medium">Year:</span>
+                      <span>{pyq.year}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600 dark:text-gray-300">
+                      <span className="w-24 font-medium">Uploaded:</span>
+                      <span>{new Date(pyq.createdAt).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <span className="w-24 font-medium">Uploaded:</span>
-                    <span>{new Date(pyq.createdAt).toLocaleDateString()}</span>
+  
+                  <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <a
+                      href={pyq.fileurl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </a>
+                    <button
+                      onClick={() => handleDelete(pyq._id)}
+                      disabled={deletingId === pyq._id}
+                      className="inline-flex items-center px-3 py-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                    >
+                      {deletingId === pyq._id ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+}
 
-                {/* Actions */}
-                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                  <a
-                    href={pyq.fileurl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </a>
-                  <button
-                    onClick={() => handleDelete(pyq._id)}
-                    disabled={deletingId === pyq._id}
-                    className="inline-flex items-center px-3 py-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                  >
-                    {deletingId === pyq._id ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-red-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Deleting...
-                      </>
-                    ) : (
-                      <>
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default MyPyqs;
+export default MyPyqs
