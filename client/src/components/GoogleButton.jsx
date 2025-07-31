@@ -3,56 +3,86 @@ import { Chrome } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { authenticationPopup, getGoogleToken } from '../../firebase/firebasePopup';
 import { toast } from 'react-hot-toast';
-import axios from 'axios';
+import axios from 'axios'
 import { useAuth } from '../context/AuthContext';
 
 const GoogleAuthButton = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const {login} = useAuth()
 
-  const handleGoogleAuth = async () => {
+  const chromeIconStyle = {
+    width: "1.25rem",
+    height: "1.25rem",
+    marginRight: "0.75rem",
+    color: "#3b82f6",
+  };
+
+  const buttonStyle = {
+    margin:"auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    maxWidth: "20rem",
+    padding: "0.75rem 1.5rem",
+    fontSize: "1rem",
+    fontWeight: 500,
+    color: "#4b5563", 
+    backgroundColor: "#ffffff", 
+    border: "1px solid #d1d5db",
+    borderRadius: "0.5rem", 
+    boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+    transition: "background-color 0.2s, color 0.2s",
+    cursor: "pointer",
+  };
+
+  const buttonHoverStyle = {
+    backgroundColor: "#f9fafb", 
+  };
+
+  const buttonFocusStyle = {
+    outline: "none",
+    boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.5)", 
+  };
+
+
+  async function handleGoogleAuth() {
     try {
       await authenticationPopup();
       const googleToken = await getGoogleToken();
-
-      const response = await axios.post(
-        `${import.meta.env.VITE_BASE_URL_BACKEND}/google-auth`,
-        {},
-        {
-          headers: {
-            authorization: `Bearer ${googleToken}`,
-          },
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL_BACKEND}/google-auth`, {}, {
+        headers:{
+            authorization:`Bearer ${googleToken}`
         }
-      );
-
-      if (!response) {
-        toast.error('⚠️ Failed to Authenticate You');
+      })
+      if(!response){
+        console.log("Error in Authenticating through google");
+        toast('⚠️ Failed to Authenticate You');
         return;
-      }
-
-      login(response.data.user, response.data.token);
+    }
+    console.log("response of google auth ", response.data);
+      login(response.data.user, response.data.token)
       navigate('/');
       toast.success('Authenticated!!!');
-    } catch (error) {
+  } catch (error) {
       if (error.response && error.response.data) {
-        toast.error(error.response.data.message);
-      }
-      console.error('Google Authentication failed:', error);
+      toast.error(error.response.data.message); // 👈 you catch the backend message here
     }
-  };
+      // toast.error(`${error.message}`);
+      console.error("Google Authentication failed:", error);
+    }
+  }
 
   return (
     <button
       onClick={handleGoogleAuth}
-      className="w- max-w-xs flex items-center m-auto justify-center gap-3 px-6 py-3 rounded-md 
-                 text-gray-600 dark:text-gray-200 
-                 bg-white dark:bg-gray-800 
-                 border border-gray-300 dark:border-gray-700 
-                 shadow transition-colors duration-300 
-                 hover:bg-gray-50 dark:hover:bg-gray-700 
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+      style={buttonStyle}
+      onMouseEnter={(e) => Object.assign(e.target.style, buttonHoverStyle)}
+      onMouseLeave={(e) => Object.assign(e.target.style, buttonStyle)}
+      onFocus={(e) => Object.assign(e.target.style, buttonFocusStyle)}
+      onBlur={(e) => Object.assign(e.target.style, buttonStyle)}
     >
-      <Chrome className="w-5 h-5 text-blue-500" />
+      <Chrome style={chromeIconStyle} />
       Continue with Google
     </button>
   );
