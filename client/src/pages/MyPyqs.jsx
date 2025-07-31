@@ -45,29 +45,29 @@ const MyPyqs = () => {
   //     }
   //   };
 
-  const handleDelete = async (pyqId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this PYQ? This action cannot be undone."
-      )
-    ) {
-      return;
-    }
+  // const handleDelete = async (pyqId) => {
+  //   if (
+  //     !window.confirm(
+  //       "Are you sure you want to delete this PYQ? This action cannot be undone."
+  //     )
+  //   ) {
+  //     return;
+  //   }
 
-    setDeletingId(pyqId);
-    try {
-      await axios.delete(
-        `${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`
-      );
-      setPyqs(pyqs.filter((pyq) => pyq._id !== pyqId));
-      toast.success("PYQ deleted successfully");
-    } catch (err) {
-      console.error("Failed to delete PYQ:", err);
-      toast.error("Failed to delete PYQ");
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  //   setDeletingId(pyqId);
+  //   try {
+  //     await axios.delete(
+  //       `${import.meta.env.VITE_BASE_URL_BACKEND}/delete-pyq/${pyqId}`
+  //     );
+  //     setPyqs(pyqs.filter((pyq) => pyq._id !== pyqId));
+  //     toast.success("PYQ deleted successfully");
+  //   } catch (err) {
+  //     console.error("Failed to delete PYQ:", err);
+  //     toast.error("Failed to delete PYQ");
+  //   } finally {
+  //     setDeletingId(null);
+  //   }
+  // };
 
   if (loading) {
     return (
