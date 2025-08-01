@@ -4,11 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import manitLogo from '../assets/manit-logo.png';
 import React from 'react';
+import { useScrollDirection } from '../hooks/useScrollDirection';
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const isVisible = useScrollDirection();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,16 +48,23 @@ export default function Navbar() {
   return (
     <>
       {/* Navbar - Always on top */}
-      <header className="bg-blue-100 shadow-md fixed top-0 w-full z-50">
+      <header
+        className={`bg-blue-100 shadow-md fixed w-full z-50 transition-transform duration-300 ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center space-x-4">
-              <img 
-                src={manitLogo} 
-                alt="MANIT Logo" 
+              <img
+                src={manitLogo}
+                alt="MANIT Logo"
                 className="h-12 w-12 object-contain"
               />
-              <Link to="/" className="text-xl md:text-2xl font-bold text-blue-700">
+              <Link
+                to="/"
+                className="text-xl md:text-2xl font-bold text-blue-700"
+              >
                 ManitStudyPortal
               </Link>
             </div>
@@ -76,7 +85,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <button
                   onClick={toggleSidebar}
-                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors mr-2"
+                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors mr-2 cursor-pointer"
                   aria-label="Open user menu"
                 >
                   <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md">
@@ -105,7 +114,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <button
                   onClick={toggleSidebar}
-                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors"
+                  className="sidebar-toggle p-2 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
                   aria-label="Open user menu"
                 >
                   <div className="h-10 w-10 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md">
@@ -135,16 +144,18 @@ export default function Navbar() {
 
       {/* Sidebar with translucent background */}
       <div
-        className={`sidebar fixed inset-y-0 right-0 w-64 bg-blue-100/95 shadow-lg transform ${
-          sidebarOpen ? 'translate-x-0' : 'translate-x-full'
-        } transition-transform duration-300 ease-in-out z-40`}
+        className={`sidebar fixed z-100 inset-y-0 right-0 w-64 bg-blue-100/95 shadow-lg transform ${
+          sidebarOpen ? "translate-x-0" : "translate-x-full"
+        } transition-all duration-300 ease-in-out ${
+          isVisible ? "top-0" : "-top-16"
+        }`}
       >
         <div className="flex flex-col h-full p-4">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-blue-700">
             <h2 className="text-lg font-semibold text-black">User Menu</h2>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded-full hover:bg-blue-700 text-black hover:text-white"
+              className="p-1 rounded-full hover:bg-blue-700 text-black hover:text-white cursor-pointer"
               aria-label="Close menu"
             >
               <X className="h-5 w-5" />
@@ -172,7 +183,7 @@ export default function Navbar() {
             <div className="mt-auto pt-4 border-t border-blue-700">
               <button
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 text-white bg-red-600 rounded-lg hover:bg-red-700 transition"
+                className="flex items-center w-full px-4 py-3 text-white bg-red-600 rounded-lg hover:bg-red-700 transition cursor-pointer"
               >
                 <LogOut className="mr-3 h-5 w-5" />
                 <span>Logout</span>

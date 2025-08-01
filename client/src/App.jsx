@@ -25,29 +25,31 @@ function App() {
     <AuthProvider>
       <Router>
         <GAListener />
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/AllNotes" element={<NotesPage />} />
-            <Route path="/pyqs" element={<PyqsPage />} />
-            <Route path="/upload-notes" element={<UploadNotesPage/>} />
-            <Route path="/upload-pyqs" element={<UploadPyqsPage />} />
-            <Route path="/Profile" element={<Profile />} />
-            <Route path="/Profile/:userId" element={<UserProfile />} />
-            <Route path="/my-notes" element={<MyNotes />} />
-            <Route path="/my-pyqs" element={<MyPyqs />} />
-            <Route path="/About" element={<About />} />
-            <Route path="/ContactUs" element={<ContactUs />} />
+        <div className="min-h-screen bg-[#eff4ff] flex flex-col">
+          <div className="flex-1 flex flex-col">
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/signup" element={<SignupPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/AllNotes" element={<NotesPage />} />
+              <Route path="/pyqs" element={<PyqsPage />} />
+              <Route path="/upload-notes" element={<UploadNotesPage />} />
+              <Route path="/upload-pyqs" element={<UploadPyqsPage />} />
+              <Route path="/Profile" element={<Profile />} />
+              <Route path="/Profile/:userId" element={<UserProfile />} />
+              <Route path="/my-notes" element={<MyNotes />} />
+              <Route path="/my-pyqs" element={<MyPyqs />} />
+              <Route path="/About" element={<About />} />
+              <Route path="/ContactUs" element={<ContactUs />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
         </div>
       </Router>
     </AuthProvider>
-  )
+  );
 }
 
 export default App
