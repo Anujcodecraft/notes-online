@@ -1,9 +1,21 @@
-import { User, Mail, Calendar, Book, FileText, CheckSquare, Clock } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import axios from 'axios';
-import { useContentHeight } from '../hooks/useContentHeight';
+import {
+  User,
+  Mail,
+  Calendar,
+  Book,
+  FileText,
+  CheckSquare,
+  Clock,
+} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { motion } from "framer-motion";
+import axios from "axios";
+import Spinner from "../components/Spinner";
+import { useContentHeight } from "../hooks/useContentHeight";
+
+
+
 
 export default function UserPagePreview() {
   const { currentUser } = useAuth();
@@ -79,9 +91,9 @@ export default function UserPagePreview() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-1px)] pt-24 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
+
+  <Spinner/>
+
     );
   }
   if (!currentUser) {

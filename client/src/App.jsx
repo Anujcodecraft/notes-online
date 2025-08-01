@@ -1,32 +1,38 @@
-import { useState } from 'react';
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import SignupPage from './pages/SignupPage';
-import LoginPage from './pages/LoginPage';
-import NotesPage from './pages/NotesPage';
-import PyqsPage from './pages/PyqsPage';
-import UploadNotesPage from './pages/UploadNotesPage';
-import UploadPyqsPage from './pages/UploadPyqsPage';
-import Navbar from './components/Navbar';
-import { AuthProvider } from './context/AuthContext';
-import Profile from './pages/Profile';
-import UserProfile from './pages/UserProfile';
-import MyNotes from './pages/MyNotes';
-import MyPyqs from './pages/MyPyqs';
-import About from './pages/About'
-import ContactUs from './pages/ContactUs'
+import { useState } from "react";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import SignupPage from "./pages/SignupPage";
+import LoginPage from "./pages/LoginPage";
+import NotesPage from "./pages/NotesPage";
+import PyqsPage from "./pages/PyqsPage";
+import UploadNotesPage from "./pages/UploadNotesPage";
+import UploadPyqsPage from "./pages/UploadPyqsPage";
+import Navbar from "./components/Navbar";
+import { AuthProvider } from "./context/AuthContext";
+import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
+import MyNotes from "./pages/MyNotes";
+import MyPyqs from "./pages/MyPyqs";
+import About from "./pages/About";
+import ContactUs from "./pages/ContactUs";
 import ReactGA from "react-ga4";
-import usePageTracking from './hooks/usePageTracking';
+import usePageTracking from "./hooks/usePageTracking";
 
 ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <GAListener />
         <div className="min-h-screen bg-[#eff4ff] flex flex-col">
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col dark:bg-gray-900 transition-colors duration-300">
             <Navbar />
             <Routes>
               <Route path="/" element={<LandingPage />} />
@@ -34,7 +40,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/AllNotes" element={<NotesPage />} />
               <Route path="/pyqs" element={<PyqsPage />} />
-              <Route path="/upload-notes" element={<UploadNotesPage />} />
+              <Route path="/upload-notes" element={<UploadNotesPage  />} />
               <Route path="/upload-pyqs" element={<UploadPyqsPage />} />
               <Route path="/Profile" element={<Profile />} />
               <Route path="/Profile/:userId" element={<UserProfile />} />
@@ -42,7 +48,6 @@ function App() {
               <Route path="/my-pyqs" element={<MyPyqs />} />
               <Route path="/About" element={<About />} />
               <Route path="/ContactUs" element={<ContactUs />} />
-
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>
@@ -52,7 +57,7 @@ function App() {
   );
 }
 
-export default App
+export default App;
 
 function GAListener() {
   usePageTracking();
