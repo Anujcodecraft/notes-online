@@ -34,6 +34,8 @@ jobs:
       VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
       VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
       VITE_BASE_URL_BACKEND: ${{ secrets.VITE_BASE_URL_BACKEND }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
     steps:
       - name: Checkout repository
@@ -44,11 +46,13 @@ jobs:
         with:
           node-version: 20.18.3
 
-      - name: Run server test
+      - name: Check if server boots up
         working-directory: server
         run: |
           npm install
-          node index.js
+          node index.js &
+          sleep 5
+          curl http://localhost:3000/
 
       - name: Run client build
         working-directory: client
