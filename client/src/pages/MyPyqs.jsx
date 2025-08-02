@@ -160,7 +160,7 @@ const MyPyqs = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
               whileHover={{ y: -5 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 card-hover"
             >
               <div className="p-6">
                 {/* Header */}

@@ -318,7 +318,7 @@ const PyqsPage = () => {
                   {pyqs.map((pyq) => (
                     <div
                       key={pyq._id}
-                      className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden card-hover"
                     >
                       <div className="p-6">
                         <div className="flex justify-between items-start">

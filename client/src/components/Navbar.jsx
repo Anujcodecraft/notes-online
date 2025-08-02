@@ -17,6 +17,7 @@ import { Link, useNavigate } from "react-router-dom";
 import manitLogo from "../assets/manit-logo.png";
 import { ThemeContext } from "../context/ThemeContext";
 import { useScrollDirection } from '../hooks/useScrollDirection';
+import './Navbar.css';
 
 export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,6 +25,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const isVisible = useScrollDirection();
+  
   // 👇 Apply `dark` class to <html> when theme changes
   useEffect(() => {
     if (theme === "dark") {
@@ -72,8 +74,8 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`bg-blue-100 dark:bg-gray-900 dark:text-white shadow-md fixed w-full z-50 transition-transform duration-300 ${
-          isVisible ? "translate-y-0" : "-translate-y-full"
+        className={`bg-blue-100 dark:bg-gray-900 dark:text-white shadow-md fixed w-full z-50 navbar-transition navbar-container transform ${
+          isVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
         }`}
       >
         {/* Navbar */}
@@ -111,7 +113,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <button
                   onClick={toggleSidebar}
-                  className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition cursor-pointer"
+                  className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition cursor-pointer sidebar-toggle"
                   aria-label="Open user menu"
                 >
                   <div className="h-10 w-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md">
@@ -157,7 +159,7 @@ export default function Navbar() {
                 <>
                   <button
                     onClick={toggleSidebar}
-                    className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition cursor-pointer"
+                    className="p-2 rounded-full hover:bg-blue-200 dark:hover:bg-gray-800 transition cursor-pointer sidebar-toggle"
                     aria-label="Open user menu"
                   >
                     <div className="h-10 w-10 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md">
@@ -201,10 +203,8 @@ export default function Navbar() {
 
       {/* Sidebar */}
       <div
-        className={`sidebar fixed z-100 inset-y-0 right-0 w-64 bg-blue-100 dark:bg-gray-800 shadow-lg transform ${
-          sidebarOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-300 ease-in-out ${
-          isVisible ? "top-0" : "-top-16"
+        className={`sidebar fixed z-99 inset-y-0 right-0 w-64 bg-blue-100/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg sidebar-transition sidebar-container transform ${
+          sidebarOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"
         }`}
       >
         <div className="flex flex-col h-full p-4 text-black dark:text-white">
