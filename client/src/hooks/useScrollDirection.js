@@ -5,13 +5,26 @@ export const useScrollDirection = () => {
   const [prevScrollPos, setPrevScrollPos] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollPos = window.scrollY;
-      const isScrollingUp = prevScrollPos > currentScrollPos;
-      const isAtTop = currentScrollPos < 10;
+    let ticking = false;
 
-      setIsVisible(isScrollingUp || isAtTop);
-      setPrevScrollPos(currentScrollPos);
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScrollPos = window.scrollY;
+          const isScrollingUp = prevScrollPos > currentScrollPos;
+          const isAtTop = currentScrollPos < 10;
+          const scrollDifference = Math.abs(currentScrollPos - prevScrollPos);
+
+          // Only update if there's significant scroll movement (prevents jittery behavior)
+          if (scrollDifference > 5) {
+            setIsVisible(isScrollingUp || isAtTop);
+            setPrevScrollPos(currentScrollPos);
+          }
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
