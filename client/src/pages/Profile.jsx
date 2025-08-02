@@ -12,13 +12,14 @@ import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import { useContentHeight } from "../hooks/useContentHeight";
 
 
 
 
 export default function UserPagePreview() {
   const { currentUser } = useAuth();
-  console.log("current user", currentUser);
+  const { contentRef, shouldScroll } = useContentHeight("rgb(249, 250, 251)"); // gray-50
   const [stats, setStats] = useState({
     notesUploaded: 0,
     pyqsUploaded: 0,
@@ -96,12 +97,22 @@ export default function UserPagePreview() {
     );
   }
   if (!currentUser) {
-    return <div>Please login or signup first</div>;
+     return (
+       <div className="flex justify-center items-center h-[calc(100vh-1px)] pt-24 text-lg text-gray-600 bg-gradient-to-br from-gray-50 to-gray-100">
+         Please login or signup first to view your profile
+       </div>
+     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen pt-6 pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+      ref={contentRef}
+      style={{
+        marginTop: "64px",
+      }}
+      className="flex-1 flex flex-col pt-10 pb-10 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800"
+    >
+      <div className="max-w-[120rem] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header with animation */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -122,10 +133,10 @@ export default function UserPagePreview() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden"
+          className="bg-white dark:bg-gray-800 shadow-xl rounded-3xl overflow-hidden w-full"
         >
           {/* Profile Header with gradient background */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-12 relative">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-16 py-16 relative">
             <div className="flex flex-col items-center">
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -142,7 +153,7 @@ export default function UserPagePreview() {
 
           {/* User Information */}
           <div className="p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* User Details Card */}
               <motion.div
                 whileHover={{ y: -5 }}
@@ -199,7 +210,7 @@ export default function UserPagePreview() {
               </motion.div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-8">
                 {statCards.map((stat, index) => (
                   <motion.div
                     key={index}

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import React from 'react';
+import { useContentHeight } from '../hooks/useContentHeight';
 
 const LandingPage = () => {
   const { isAuthenticated, currentUser } = useAuth();
+  const { contentRef, shouldScroll } = useContentHeight();
 
   const handleWhatsAppClick = () => {
     const phoneNumber = '918462892088';
@@ -34,14 +36,14 @@ const LandingPage = () => {
           {isAuthenticated ? (
             <>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link 
-                  to="/AllNotes" 
+                <Link
+                  to="/AllNotes"
                   className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:from-blue-600 hover:to-blue-700"
                 >
                   Browse Notes
                 </Link>
-                <Link 
-                  to="/pyqs" 
+                <Link
+                  to="/pyqs"
                   className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:from-green-600 hover:to-green-700"
                 >
                   Browse PYQs
@@ -68,8 +70,8 @@ const LandingPage = () => {
             <div className="mt-8">
               <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-6">Get Started</h2>
               <div className="flex flex-wrap justify-center gap-4">
-                <Link 
-                  to="/signup" 
+                <Link
+                  to="/signup"
                   className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg shadow-md hover:shadow-lg transition-all hover:from-blue-600 hover:to-indigo-600"
                 >
                   Sign Up
@@ -112,7 +114,7 @@ const LandingPage = () => {
       </div>
 
       {/* Features Section */}
-      <div className="container mx-auto px-4 pb-20">
+      <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           
           {/* Feature Card 1 */}
