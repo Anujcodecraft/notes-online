@@ -10,7 +10,6 @@ import { Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import Spinner from "../components/Spinner";
 
-
 const PyqsPage = () => {
   const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,8 +100,11 @@ const PyqsPage = () => {
       );
       if (!response.ok) throw new Error("Failed to fetch PYQs");
 
-      const data = await response.json();
-
+      let data = await response.json();
+      // extract isLastPage and assign notes to data
+      const isLastPage = data?.isLastPage;
+      if (isLastPage) setHasMore(!isLastPage);
+      data = data?.pyqs;
       const processedData = data.map((pyq) => ({
         ...pyq,
         uploadedBy: pyq.user || { name: "Unknown" },
